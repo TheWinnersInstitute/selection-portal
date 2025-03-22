@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  role      Role
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  boards    Board[]
+  exams     Exam[]
+  Session   Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      Role
+  hash      String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@map("sessions")
+}
+
+model Board {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  exams       Exam[]
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("boards")
+}
+
+model Exam {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  boardId     String
+  userId      String
+  examDate    DateTime
+
+  examStatus ExamStatus @default(pending)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  board      Board        @relation(fields: [boardId], references: [id])
+  user       User         @relation(fields: [userId], references: [id])
+  Enrollment Enrollment[]
+
+  @@unique([boardId, name])
+  @@map("exams")
+}
+
+model Student {
+  id            String    @id @default(uuid())
+  name          String
+  dateOfBirth   DateTime?
+  contactNumber String?
+  email         String
+  image         Asset?    @relation("student_image", fields: [imageId], references: [id])
+  fatherName    String?
+  city          String?
+  state         String?
+  postAllotment String?
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  imageId    String?
+  Enrollment Enrollment[]
+
+  @@map("students")
+}
+
+model Enrollment {
+  id     String @id @default(uuid())
+  rollNo String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  result   Asset?  @relation("student_result", fields: [resultId], references: [id])
+  resultId String?
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String
+
+  exam   Exam   @relation(fields: [examId], references: [id])
+  examId String
+
+  @@map("enrollments")
+}
+
+model Asset {
+  id            String       @id @default(uuid())
+  path          String
+  type          String
+  studentImage  Student[]    @relation("student_image")
+  studentResult Enrollment[] @relation("student_result")
+
+  @@map("assets")
+}
+
+enum ExamStatus {
+  pending
+  ongoing
+  ended
+}
