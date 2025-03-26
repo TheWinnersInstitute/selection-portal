@@ -1,9 +1,10 @@
 import { google } from "googleapis";
 import fs from "fs";
-import { s3 } from "./s3";
+// import { s3 } from "./s3";
 import { prisma } from "./db";
 import { Response } from "express";
 import path from "path";
+import { S3 } from "./s3";
 
 const auth = new google.auth.GoogleAuth({
   keyFile: path.join(__dirname, "../../google-service.json"),
@@ -49,7 +50,7 @@ export const uploadDriveFileToS3 = async (url: string): Promise<string> => {
             "File metadata is incomplete. Name or MIME type is missing."
           );
         }
-        const s3Upload = await s3
+        const s3Upload = await S3.instance.s3
           .upload({
             Bucket: process.env.AWS_S3_BUCKET as string,
             Key: `student-portal/${fileId}_${fileMeta.name}`,

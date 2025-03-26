@@ -12,7 +12,7 @@ import { checkAuth } from "../middleware/checkAuth";
 import { checkAdmin } from "../middleware/checkAdmin";
 import { checkReturnPayload } from "../middleware/checkRequestPayload";
 import { z } from "zod";
-import { studentBulkUpload, upload } from "../lib/s3";
+import { S3, studentBulkUpload } from "../lib/s3";
 import { downloadStudentsExcel } from "../controllers/student/download";
 
 export const studentRoutes = Router();
@@ -33,7 +33,7 @@ studentRoutes.post(
   "/",
   checkAuth,
   checkAdmin,
-  upload.single("file"),
+  S3.instance.uploadFile.single("file"),
   checkReturnPayload(
     z.object({
       name: z.string().max(100).min(1),
@@ -66,7 +66,7 @@ studentRoutes.patch(
   "/",
   checkAuth,
   checkAdmin,
-  upload.single("file"),
+  S3.instance.uploadFile.single("file"),
   checkReturnPayload(
     z.object({
       id: z.string().uuid(),
