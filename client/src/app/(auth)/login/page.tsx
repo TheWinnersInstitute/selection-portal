@@ -22,7 +22,7 @@ export default function LoginServer() {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, login } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) router.push("/");
@@ -43,6 +43,7 @@ export default function LoginServer() {
         }
       );
       localStorage.setItem("__session", JSON.stringify(data.data[0]));
+      login(data.data[0]);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast(error.response?.data?.message || "Something went wrong");

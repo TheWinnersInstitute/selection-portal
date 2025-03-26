@@ -31,44 +31,51 @@ export const pipeFile = async (res: Response, url: string) => {
 
 export const uploadDriveFileToS3 = async (url: string): Promise<string> => {
   return new Promise(async (res, rej) => {
-    const _url = new URL(url);
-    const fileId = _url.searchParams.get("id");
-    if (fileId) {
-      const { data: fileMeta } = await googleDrive.files.get({
-        fileId,
-        fields: "name, mimeType",
-      });
-      const tempFilePath = path.join(__dirname, `../../assets/temp_${fileId}`);
-      const dest = fs.createWriteStream(tempFilePath);
-      const response = await googleDrive.files.get(
-        { fileId, alt: "media" },
-        { responseType: "stream" }
-      );
-      dest.on("finish", async () => {
-        if (!fileMeta.name || !fileMeta.mimeType) {
-          throw new Error(
-            "File metadata is incomplete. Name or MIME type is missing."
-          );
-        }
-        const s3Upload = await S3.instance.s3
-          .upload({
-            Bucket: process.env.AWS_S3_BUCKET as string,
-            Key: `student-portal/${fileId}_${fileMeta.name}`,
-            Body: fs.createReadStream(tempFilePath),
-            ContentType: fileMeta.mimeType,
-          })
-          .promise();
-        const asset = await prisma.asset.create({
-          data: {
-            path: s3Upload.Location,
-            type: fileMeta.mimeType,
-          },
+    try {
+      const _url = new URL(url);
+      const fileId = _url.searchParams.get("id");
+      if (fileId) {
+        const { data: fileMeta } = await googleDrive.files.get({
+          fileId,
+          fields: "name, mimeType",
         });
-        fs.unlinkSync(tempFilePath);
-        res(asset.id);
-      });
-      dest.on("error", rej);
-      response.data.pipe(dest);
+        const tempFilePath = path.join(
+          __dirname,
+          `../../assets/temp_${fileId}`
+        );
+        const dest = fs.createWriteStream(tempFilePath);
+        const response = await googleDrive.files.get(
+          { fileId, alt: "media" },
+          { responseType: "stream" }
+        );
+        dest.on("finish", async () => {
+          if (!fileMeta.name || !fileMeta.mimeType) {
+            throw new Error(
+              "File metadata is incomplete. Name or MIME type is missing."
+            );
+          }
+          const s3Upload = await S3.instance.s3
+            .upload({
+              Bucket: process.env.AWS_S3_BUCKET as string,
+              Key: `student-portal/${fileId}_${fileMeta.name}`,
+              Body: fs.createReadStream(tempFilePath),
+              ContentType: fileMeta.mimeType,
+            })
+            .promise();
+          const asset = await prisma.asset.create({
+            data: {
+              path: s3Upload.Location,
+              type: fileMeta.mimeType,
+            },
+          });
+          fs.unlinkSync(tempFilePath);
+          res(asset.id);
+        });
+        dest.on("error", rej);
+        response.data.pipe(dest);
+      }
+    } catch (error) {
+      rej(error);
     }
   });
 };

@@ -19,7 +19,7 @@ export class RedisClient {
       password: process.env.REDIS_PASSWORD as string,
       maxRetriesPerRequest: null,
     });
-    this.queue = new Queue("bulk-upload-queue", {
+    this.queue = new Queue(process.env.REDIS_QUEUE as string, {
       connection: this.redisClient,
     });
     this.worker();
@@ -37,7 +37,7 @@ export class RedisClient {
 
   worker() {
     const worker = new Worker(
-      "bulk-upload-queue",
+      process.env.REDIS_QUEUE as string,
       async (job) => {
         const { row, exams } = job.data;
         try {
