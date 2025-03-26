@@ -20,8 +20,8 @@ examRoutes.post(
   checkReturnPayload(
     z.object({
       name: z.string().max(100).min(1),
-      description: z.string().max(1000).min(5),
-      examDate: z.date(),
+      description: z.string().max(1000).optional(),
+      examDate: z.string().datetime(),
       boardId: z.string().uuid(),
     })
   ),
@@ -48,8 +48,8 @@ examRoutes.patch(
     z.object({
       id: z.string().uuid(),
       name: z.string().max(100).min(1),
-      description: z.string().max(1000).min(5),
-      examDate: z.date(),
+      description: z.string().max(1000).optional(),
+      examDate: z.string().datetime(),
       boardId: z.string().uuid(),
     })
   ),

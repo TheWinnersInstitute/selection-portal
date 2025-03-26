@@ -77,25 +77,26 @@ model Student {
   id            String    @id @default(uuid())
   name          String
   dateOfBirth   DateTime?
-  contactNumber String?
-  email         String
+  contactNumber BigInt
+  email         String?
   image         Asset?    @relation("student_image", fields: [imageId], references: [id])
   fatherName    String?
   city          String?
   state         String?
-  postAllotment String?
 
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   imageId    String?
   Enrollment Enrollment[]
 
+  @@unique([name, contactNumber])
   @@map("students")
 }
 
 model Enrollment {
-  id     String @id @default(uuid())
-  rollNo String
+  id         String  @id @default(uuid())
+  rollNumber BigInt
+  post       String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

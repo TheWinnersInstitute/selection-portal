@@ -23,5 +23,7 @@ export async function seed() {
       },
     });
     console.log("Admin user created successfully");
+  } else {
+    console.log("Admin user already exist");
   }
 }

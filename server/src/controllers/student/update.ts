@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { prisma } from "../../lib";
+import { errorResponse, prisma } from "../../lib";
+import { serializeBigint, studentInclude } from ".";
 
 export async function updateStudent(
   req: Request,
@@ -15,13 +16,14 @@ export async function updateStudent(
       dateOfBirth,
       fatherName,
       state,
-      postAllotment,
+      // postAllotment,
     } = req.body;
     let imageId: string | undefined;
     if (req.file) {
       const asset = await prisma.asset.create({
         data: {
-          path: req.file.path,
+          // @ts-ignore
+          path: req.file.location,
           type: req.file.mimetype,
         },
       });
@@ -37,22 +39,20 @@ export async function updateStudent(
         name,
         city,
         contactNumber,
-        dateOfBirth,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
         fatherName,
         imageId,
         state,
-        postAllotment,
+        // postAllotment,
       },
+      include: studentInclude,
     });
+
     res.status(200).json({
       message: "success",
-      data: [updatedStudent],
+      data: [serializeBigint(updatedStudent)],
     });
   } catch (error) {
-    if (error instanceof Error)
-      res.status(500).json({
-        message: "Internal server error",
-        details: error.message,
-      });
+    errorResponse(res, error);
   }
 }

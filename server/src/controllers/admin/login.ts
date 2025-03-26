@@ -41,7 +41,13 @@ export async function adminLogin(req: Request, res: Response): Promise<void> {
     });
     res.status(200).json({
       message: "Login successful",
-      data: [sessionHash],
+      data: [
+        {
+          sessionHash,
+          email: user.email,
+          role: user.role,
+        },
+      ],
     });
     return;
   } catch (error) {

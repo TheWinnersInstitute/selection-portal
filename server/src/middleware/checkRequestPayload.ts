@@ -11,9 +11,9 @@ export function checkReturnPayload(
 
       if (!success) {
         res.status(400).json({
-          message: "Invalid Input",
-          details: error.message,
+          message: JSON.parse(error.message)[0].message,
         });
+        return;
       }
       next();
     } catch (error) {
