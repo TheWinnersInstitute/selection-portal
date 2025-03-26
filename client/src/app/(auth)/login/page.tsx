@@ -4,22 +4,24 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function LoginServer() {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
   const { isAuthenticated, login } = useAuth();
@@ -57,9 +59,9 @@ export default function LoginServer() {
       <Card className="mt-5 w-[80%] md:w-[50%] lg:w-[40%]">
         <CardHeader>
           <CardTitle>Login</CardTitle>
-          <CardDescription>
+          {/* <CardDescription>
             Register if you don&apos;t have an account.
-          </CardDescription>
+          </CardDescription> */}
         </CardHeader>
         <CardContent>
           <form className="flex flex-col gap-3 w-full">
@@ -79,14 +81,25 @@ export default function LoginServer() {
                 ref={passwordRef}
                 className="w-full"
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
               />
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="showPassword"
+                  onCheckedChange={(v) => setShowPassword((prev) => !prev)}
+                />
+                <label
+                  htmlFor="showPassword"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Show password
+                </label>
+              </div>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex justify-end">
-          {/* <Button variant="outline">Register</Button> */}
           <Button onClick={loginHandler}>Login</Button>
         </CardFooter>
       </Card>

@@ -8,17 +8,14 @@ export * from "./create-many";
 export * from "./download-errored";
 
 export const studentInclude = {
-  image: true,
   Enrollment: {
     include: {
-      result: true,
       exam: true,
     },
   },
 };
 
 interface EnrollmentType extends Enrollment {
-  result: Asset | null;
   exam: Exam;
 }
 

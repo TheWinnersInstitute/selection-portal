@@ -28,7 +28,7 @@ type Student = {
   state: string | null;
   postAllotment: string | null;
   imageId: string | null;
-  image: Asset | null;
+  // image: Asset | null;
   Enrollment:
     | {
         id: string;
@@ -39,14 +39,14 @@ type Student = {
         resultId: string | null;
         studentId: string;
         examId: string;
-        result: Asset;
+        // result: Asset;
         exam: Exam;
       }[]
     | null;
 };
 
-type Asset = {
-  id: string;
-  path: string;
-  type: string;
-};
+// type Asset = {
+//   id: string;
+//   path: string;
+//   type: string;
+// };

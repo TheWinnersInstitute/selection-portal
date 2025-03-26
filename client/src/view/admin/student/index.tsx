@@ -19,14 +19,14 @@ import { useLoading } from "@/hooks/use-loading";
 // export const STUDENTS_PER_PAGE = 5;
 
 export default function AdminStudentsPage() {
-  const { apiClient } = useAuth();
+  const { apiClient, isAuthenticated } = useAuth();
   const [showAddBoardForm, setShowAddBoardForm] = useState(false);
   const { setStudents, students } = useData();
   const [editData, setEditData] = useState<null | Student>(null);
   const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(-1);
-  const [studentsPerPage, setStudentsPerPage] = useState(5);
+  const [studentsPerPage, setStudentsPerPage] = useState(25);
 
   const fetchingStudents = useLoading();
 
@@ -71,13 +71,14 @@ export default function AdminStudentsPage() {
   useEffect(() => {
     if (
       students.length < currentPage * studentsPerPage &&
-      students.length !== total
+      students.length !== total &&
+      isAuthenticated
     ) {
       fetchingStudents.asyncWrapper(() =>
         fetchStudents(students.length, selectedExamId)
       );
     }
-  }, [currentPage, total, studentsPerPage]);
+  }, [currentPage, total, studentsPerPage, isAuthenticated]);
 
   const toggleAddBoardForm = () => setShowAddBoardForm((prev) => !prev);
 

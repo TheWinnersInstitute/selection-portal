@@ -19,6 +19,7 @@ type AuthContextType = {
   user: User;
   login: (data: User) => void;
   apiClient: Axios;
+  logoutHandler: () => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -26,15 +27,18 @@ const AuthContext = createContext<AuthContextType>({
   user: { email: "", role: "", sessionHash: "" },
   login: () => {},
   apiClient: axios,
+  logoutHandler: () => {},
 });
+
+const DEFAULT_USER = {
+  email: "",
+  role: "",
+  sessionHash: "",
+};
 
 export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User>({
-    email: "",
-    role: "",
-    sessionHash: "",
-  });
+  const [user, setUser] = useState<User>(DEFAULT_USER);
 
   useEffect(() => {
     const __session = localStorage.getItem("__session");
@@ -60,6 +64,14 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
     setIsAuthenticated(true);
   };
 
+  const logoutHandler = () => {
+    localStorage.removeItem("__session");
+    setIsAuthenticated(false);
+    setUser(DEFAULT_USER);
+    apiClient.get("/api/admin/logout").catch(console.log);
+    window.location.reload();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -67,6 +79,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
         user,
         login,
         apiClient,
+        logoutHandler,
       }}
     >
       {children}

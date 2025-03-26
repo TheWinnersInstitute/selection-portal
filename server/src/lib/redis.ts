@@ -68,7 +68,8 @@ export class RedisClient {
           let profileId: string | undefined;
           let resultId: string | undefined;
           if (!student) {
-            if (photo) profileId = await uploadDriveFileToS3(photo);
+            if (photo)
+              profileId = await uploadDriveFileToS3(photo, "student-profiles");
             student = await prisma.student.create({
               data: {
                 name,
@@ -79,7 +80,11 @@ export class RedisClient {
           }
 
           if (exams[examName]) {
-            if (resultPdf) resultId = await uploadDriveFileToS3(resultPdf);
+            if (resultPdf)
+              resultId = await uploadDriveFileToS3(
+                resultPdf,
+                "student-results"
+              );
             if (resultId) {
               await prisma.enrollment.create({
                 data: {

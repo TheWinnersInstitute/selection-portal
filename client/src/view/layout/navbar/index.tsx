@@ -41,7 +41,7 @@ const items = [
 ];
 
 export default function Navbar({ children }: PropsWithChildren) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logoutHandler } = useAuth();
   const pathname = usePathname();
 
   return (
@@ -58,10 +58,10 @@ export default function Navbar({ children }: PropsWithChildren) {
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <a href={item.url}>
+                      <Link href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -83,6 +83,11 @@ export default function Navbar({ children }: PropsWithChildren) {
               <Link href="/admin/board">
                 <Button>Admin</Button>
               </Link>
+            )}
+            {isAuthenticated && (
+              <Button onClick={logoutHandler} variant="outline" color="">
+                Logout
+              </Button>
             )}
             {!isAuthenticated && (
               <Link href="/login">

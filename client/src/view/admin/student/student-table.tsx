@@ -127,9 +127,9 @@ export default function StudentTable({
                     <TableCell
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (student.image?.path) {
+                        if (student.imageId) {
                           window.open(
-                            student.image?.path,
+                            `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${student.imageId}`,
                             "_blank",
                             "noopener,noreferrer"
                           );
@@ -138,7 +138,7 @@ export default function StudentTable({
                     >
                       <Avatar>
                         <AvatarImage
-                          src={student.image?.path}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${student.imageId}`}
                           alt={student.id}
                         />
                         <AvatarFallback>
@@ -152,9 +152,10 @@ export default function StudentTable({
                     <TableCell
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (student.Enrollment?.[0]?.result) {
+                        const resultId = student.Enrollment?.[0]?.resultId;
+                        if (resultId) {
                           window.open(
-                            student.Enrollment[0].result.path,
+                            `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${resultId}`,
                             "_blank",
                             "noopener,noreferrer"
                           );
@@ -285,7 +286,7 @@ export default function StudentTable({
                   </div>
                   <div className="flex justify-between items-center gap-1">
                     <p>Exam: {enrollment.exam.name}</p>
-                    <p>Roll number: {enrollment.result.path}</p>
+                    {/* <p>Roll number: {enrollment.result.path}</p> */}
                   </div>
                 </div>
               );

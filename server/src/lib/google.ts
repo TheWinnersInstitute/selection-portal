@@ -29,7 +29,10 @@ export const pipeFile = async (res: Response, url: string) => {
   res.json({ message: "file now fount" });
 };
 
-export const uploadDriveFileToS3 = async (url: string): Promise<string> => {
+export const uploadDriveFileToS3 = async (
+  url: string,
+  folder: string
+): Promise<string> => {
   return new Promise(async (res, rej) => {
     try {
       const _url = new URL(url);
@@ -57,14 +60,14 @@ export const uploadDriveFileToS3 = async (url: string): Promise<string> => {
           const s3Upload = await S3.instance.s3
             .upload({
               Bucket: process.env.AWS_S3_BUCKET as string,
-              Key: `student-portal/${fileId}_${fileMeta.name}`,
+              Key: `${folder}/${fileId}_${fileMeta.name}`,
               Body: fs.createReadStream(tempFilePath),
               ContentType: fileMeta.mimeType,
             })
             .promise();
           const asset = await prisma.asset.create({
             data: {
-              path: s3Upload.Location,
+              path: s3Upload.Key,
               type: fileMeta.mimeType,
             },
           });

@@ -29,7 +29,7 @@ export class S3 {
           cb(null, { fieldName: file.fieldname });
         },
         key: function (req, file, cb) {
-          cb(null, `student-portal/${Date.now()}_${file.originalname}`);
+          cb(null, `student-profiles/${Date.now()}_${file.originalname}`);
         },
       }),
     });

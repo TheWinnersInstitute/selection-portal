@@ -23,7 +23,7 @@ export async function createStudent(
       const asset = await prisma.asset.create({
         data: {
           // @ts-ignore
-          path: req.file.location,
+          path: req.file.key,
           type: req.file.mimetype,
         },
       });

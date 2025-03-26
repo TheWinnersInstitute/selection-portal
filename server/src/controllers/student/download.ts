@@ -15,7 +15,7 @@ export async function downloadStudentsExcel(req: Request, res: Response) {
       const studentData = {
         Name: student.name,
         MobileNumber: student.contactNumber.toString(),
-        Photo: student.image?.path || "",
+        Photo: `${process.env.BACKEND_URL}/api/admin/assets/${student.imageId}`,
       };
       return student.Enrollment.map((enrollment) => {
         return {
@@ -23,7 +23,7 @@ export async function downloadStudentsExcel(req: Request, res: Response) {
           "EXAM Name": enrollment.exam.name,
           POST: enrollment.post,
           "Roll Number": enrollment.rollNumber.toString(),
-          Result: enrollment.result?.path || "",
+          Result: `${process.env.BACKEND_URL}/api/admin/assets/${enrollment.resultId}`,
         };
       });
     });

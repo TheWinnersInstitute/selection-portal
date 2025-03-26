@@ -47,42 +47,42 @@ export default function Header({
 }: Props) {
   const { students, exams } = useData();
 
-  const downloadPfdHandler = async () => {
-    const doc = new jsPDF();
+  // const downloadPfdHandler = async () => {
+  //   const doc = new jsPDF();
 
-    let index = 0;
-    const imageWidth = 100;
-    const imageHeight = 100;
-    for (const student of students) {
-      if (student.image) {
-        try {
-          const base64Img = await getBase64Image(
-            student.image.path,
-            student.image.type
-          );
-          if (typeof base64Img === "string") {
-            console.log(base64Img);
-            doc.addImage(
-              base64Img,
-              student.image.type.split("/")[1].toUpperCase(),
-              10,
-              30 + imageHeight * index,
-              imageWidth,
-              imageHeight
-            );
-          }
-          index++;
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    }
-    if (index !== 0) {
-      doc.save("students.pdf");
-    } else {
-      toast("No data to export");
-    }
-  };
+  //   let index = 0;
+  //   const imageWidth = 100;
+  //   const imageHeight = 100;
+  //   for (const student of students) {
+  //     if (student.image) {
+  //       try {
+  //         const base64Img = await getBase64Image(
+  //           student.image.path,
+  //           student.image.type
+  //         );
+  //         if (typeof base64Img === "string") {
+  //           console.log(base64Img);
+  //           doc.addImage(
+  //             base64Img,
+  //             student.image.type.split("/")[1].toUpperCase(),
+  //             10,
+  //             30 + imageHeight * index,
+  //             imageWidth,
+  //             imageHeight
+  //           );
+  //         }
+  //         index++;
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   }
+  //   if (index !== 0) {
+  //     doc.save("students.pdf");
+  //   } else {
+  //     toast("No data to export");
+  //   }
+  // };
   return (
     <div className="flex justify-between items-center pt-3 mb-3">
       <h2>Students</h2>

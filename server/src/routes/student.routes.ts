@@ -18,6 +18,8 @@ import { downloadStudentsExcel } from "../controllers/student/download";
 export const studentRoutes = Router();
 studentRoutes.get(
   "/",
+  checkAuth,
+  checkAdmin,
   checkReturnPayload(
     z.object({
       skip: z.string().max(4).optional(),
