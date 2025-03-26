@@ -41,6 +41,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useLoading } from "@/hooks/use-loading";
 
 type Props = {
   editHandler: (data: Student) => void;
@@ -49,6 +50,7 @@ type Props = {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   studentsPerPage: number;
   setStudentsPerPage: React.Dispatch<React.SetStateAction<number>>;
+  loader: React.JSX.Element | null;
 };
 
 export default function StudentTable({
@@ -58,6 +60,7 @@ export default function StudentTable({
   setCurrentPage,
   setStudentsPerPage,
   studentsPerPage,
+  loader,
 }: Props) {
   const [showViewStudentModel, setShowViewStudentModel] = useState(false);
   const [currentStudent, setCurrentStudent] = useState<null | Student>(null);
@@ -65,10 +68,12 @@ export default function StudentTable({
   const { students, setStudents } = useData();
   const { apiClient } = useAuth();
 
+  const deletingStudent = useLoading();
+
   const deleteHandler = async (id: string) => {
     try {
       await apiClient.delete(`/api/student/${id}`);
-      toast("Board deleted successfully");
+      toast("Student deleted successfully");
       setStudents((prev) => prev.filter((student) => student.id !== id));
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -176,11 +181,13 @@ export default function StudentTable({
                       <Button
                         variant="outline"
                         onClick={() => {
-                          deleteHandler(student.id);
+                          deletingStudent.asyncWrapper(() =>
+                            deleteHandler(student.id)
+                          );
                         }}
                         size="sm"
                       >
-                        Delete
+                        {deletingStudent.loader || "Delete"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -188,6 +195,9 @@ export default function StudentTable({
               })}
           </TableBody>
         </Table>
+      )}
+      {loader && (
+        <div className="flex justify-center items-center my-4">{loader}</div>
       )}
       <Pagination className="mt-3">
         <PaginationContent className=" gap-3">

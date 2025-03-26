@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
+import { useLoading } from "@/hooks/use-loading";
 import { AxiosError } from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -11,6 +12,9 @@ export default function BulkUpload() {
   const [underProcess, setUnderProcess] = useState(0);
   const [pooling, setPooling] = useState(true);
   const { apiClient, isAuthenticated } = useAuth();
+
+  const downloadingStudentData = useLoading();
+  const downloadingErroredData = useLoading();
 
   useEffect(() => {
     if (pooling && isAuthenticated) {
@@ -51,65 +55,69 @@ export default function BulkUpload() {
     }
   };
 
-  const downloadErroredDataHandler = async () => {
-    try {
-      const response = await apiClient.get("/api/student/bulk-error", {
-        responseType: "blob",
-      });
+  const downloadErroredDataHandler = () => {
+    downloadingErroredData.asyncWrapper(async () => {
+      try {
+        const response = await apiClient.get("/api/student/bulk-error", {
+          responseType: "blob",
+        });
 
-      const blob = new Blob([response.data], {
-        type: response.headers["content-type"],
-      });
-      const url = window.URL.createObjectURL(blob);
+        const blob = new Blob([response.data], {
+          type: response.headers["content-type"],
+        });
+        const url = window.URL.createObjectURL(blob);
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "errored-data.xlsx");
-      document.body.appendChild(link);
-      link.click();
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "errored-data.xlsx");
+        document.body.appendChild(link);
+        link.click();
 
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast(error.response?.data?.message || "No error data available");
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast(error.response?.data?.message || "No error data available");
+        }
       }
-    }
+    });
   };
 
-  const downloadStudentsDataHandler = async () => {
-    try {
-      const response = await apiClient.get("/api/student/bulk", {
-        responseType: "blob",
-      });
+  const downloadStudentsDataHandler = () => {
+    downloadingStudentData.asyncWrapper(async () => {
+      try {
+        const response = await apiClient.get("/api/student/bulk", {
+          responseType: "blob",
+        });
 
-      const blob = new Blob([response.data], {
-        type: response.headers["content-type"],
-      });
-      const url = window.URL.createObjectURL(blob);
+        const blob = new Blob([response.data], {
+          type: response.headers["content-type"],
+        });
+        const url = window.URL.createObjectURL(blob);
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "students-data.xlsx");
-      document.body.appendChild(link);
-      link.click();
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "students-data.xlsx");
+        document.body.appendChild(link);
+        link.click();
 
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast(error.response?.data?.message || "No error data available");
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast(error.response?.data?.message || "No error data available");
+        }
       }
-    }
+    });
   };
 
   return (
     <>
       <Button onClick={downloadErroredDataHandler}>
-        Download errored data
+        {downloadingErroredData.loader || "Download errored data"}
       </Button>
       <Button onClick={downloadStudentsDataHandler}>
-        Download students data
+        {downloadingStudentData.loader || "Download students data"}
       </Button>
       <input
         multiple={false}

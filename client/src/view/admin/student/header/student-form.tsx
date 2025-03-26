@@ -33,12 +33,13 @@ import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { useLoading } from "@/hooks/use-loading";
 
 export const studentFormSchema = z.object({
   name: z.string().max(100).min(1),
-  email: z.string().email().max(100).min(1),
+  email: z.string().email().optional(),
   city: z.string().max(100).optional(),
-  contactNumber: z.string().max(100).optional(),
+  contactNumber: z.string().length(10),
   dateOfBirth: z.date().optional(),
   fatherName: z.string().max(100).optional(),
   state: z.string().max(100).optional(),
@@ -66,44 +67,48 @@ export default function StudentForm({
     keyof typeof StateAndCities
   ];
 
-  async function onSubmit(values: StudentFormValues) {
-    try {
-      const formData = new FormData();
-      if (editData) formData.append("id", editData.id);
-      if (values.dateOfBirth)
-        formData.append("dateOfBirth", values.dateOfBirth.toISOString());
-      if (values.city) formData.append("city", values.city);
-      if (values.state) formData.append("state", values.state);
-      if (values.contactNumber)
-        formData.append("contactNumber", values.contactNumber);
-      if (values.email) formData.append("email", values.email);
-      if (values.fatherName) formData.append("fatherName", values.fatherName);
-      if (values.name) formData.append("name", values.name);
+  const addingStudent = useLoading();
 
-      if (profile) formData.append("file", profile);
+  function onSubmit(values: StudentFormValues) {
+    addingStudent.asyncWrapper(async () => {
+      try {
+        const formData = new FormData();
+        if (editData) formData.append("id", editData.id);
+        if (values.dateOfBirth)
+          formData.append("dateOfBirth", values.dateOfBirth.toISOString());
+        if (values.city) formData.append("city", values.city);
+        if (values.state) formData.append("state", values.state);
+        if (values.contactNumber)
+          formData.append("contactNumber", values.contactNumber);
+        if (values.email) formData.append("email", values.email);
+        if (values.fatherName) formData.append("fatherName", values.fatherName);
+        if (values.name) formData.append("name", values.name);
 
-      const { data } = await apiClient[editData ? "patch" : "post"](
-        "/api/student",
-        formData
-      );
-      if (editData) {
-        setStudents((prev) =>
-          prev.map((student) => {
-            if (student.id === editData.id) {
-              return data.data[0];
-            }
-            return student;
-          })
+        if (profile) formData.append("file", profile);
+
+        const { data } = await apiClient[editData ? "patch" : "post"](
+          "/api/student",
+          formData
         );
-        toggleAddBoardForm();
-      } else {
-        setStudents((prev) => [...prev, data.data[0]]);
+        if (editData) {
+          setStudents((prev) =>
+            prev.map((student) => {
+              if (student.id === editData.id) {
+                return data.data[0];
+              }
+              return student;
+            })
+          );
+          toggleAddBoardForm();
+        } else {
+          setStudents((prev) => [...prev, data.data[0]]);
+        }
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast(error.response?.data?.message || "Something went wrong");
+        }
       }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast(error.response?.data?.message || "Something went wrong");
-      }
-    }
+    });
   }
 
   const states = useMemo(() => {
@@ -313,7 +318,9 @@ export default function StudentForm({
                 Close
               </Button>
             </DialogClose>
-            <Button>{editData ? "Update" : "Add"}</Button>
+            <Button>
+              {addingStudent.loader || (editData ? "Update" : "Add")}
+            </Button>
           </DialogFooter>
         </form>
       </Form>

@@ -14,6 +14,7 @@ import { studentFormSchema } from "./header/student-form";
 import StudentTable from "./student-table";
 
 import Header from "./header";
+import { useLoading } from "@/hooks/use-loading";
 
 // export const STUDENTS_PER_PAGE = 5;
 
@@ -26,6 +27,8 @@ export default function AdminStudentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(-1);
   const [studentsPerPage, setStudentsPerPage] = useState(5);
+
+  const fetchingStudents = useLoading();
 
   const form = useForm<z.infer<typeof studentFormSchema>>({
     resolver: zodResolver(studentFormSchema),
@@ -63,22 +66,18 @@ export default function AdminStudentsPage() {
     setStudents([]);
     setCurrentPage(1);
     setTotal(-1);
-    // fetchStudents(0, selectedExamId);
   }, [selectedExamId]);
 
   useEffect(() => {
-    console.log({
-      "students.length": students.length,
-      "currentPage * studentsPerPage": currentPage * studentsPerPage,
-      total,
-    });
     if (
       students.length < currentPage * studentsPerPage &&
       students.length !== total
     ) {
-      fetchStudents(students.length, selectedExamId);
+      fetchingStudents.asyncWrapper(() =>
+        fetchStudents(students.length, selectedExamId)
+      );
     }
-  }, [currentPage, total, studentsPerPage, students.length]);
+  }, [currentPage, total, studentsPerPage]);
 
   const toggleAddBoardForm = () => setShowAddBoardForm((prev) => !prev);
 
@@ -106,6 +105,7 @@ export default function AdminStudentsPage() {
           form.setValue("state", student.state || "");
           toggleAddBoardForm();
         }}
+        loader={fetchingStudents.loader}
         total={total}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
