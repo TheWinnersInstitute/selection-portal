@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { authRoutes, boardRoutes, examRoutes, studentRoutes } from "./routes";
-import { RedisClient, seed } from "./lib";
+import { RedisClient, S3, seed } from "./lib";
 import { adminRoutes } from "./routes/admin.routes";
 
 dotenv.config();
@@ -14,6 +14,7 @@ async function main() {
   await seed();
 
   RedisClient.Instance;
+  S3.instance;
   app.use(cors());
   app.use(express.json({ limit: "50mb" }));
 
