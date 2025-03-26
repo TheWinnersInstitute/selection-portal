@@ -1,11 +1,11 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+console.log(`Port - ${process.env.PORT}`);
+import express from "express";
 import cors from "cors";
 import { authRoutes, boardRoutes, examRoutes, studentRoutes } from "./routes";
 import { RedisClient, S3, seed } from "./lib";
 import { adminRoutes } from "./routes/admin.routes";
-
-dotenv.config();
 
 async function main() {
   const PORT = process.env.PORT;
