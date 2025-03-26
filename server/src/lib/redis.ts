@@ -80,21 +80,31 @@ export class RedisClient {
           }
 
           if (exams[examName]) {
-            if (resultPdf)
-              resultId = await uploadDriveFileToS3(
-                resultPdf,
-                "student-results"
-              );
-            if (resultId) {
-              await prisma.enrollment.create({
-                data: {
-                  rollNumber: parseInt(rollNumber, 10),
+            const enrollment = await prisma.enrollment.findUnique({
+              where: {
+                rollNumber_examId: {
                   examId: exams[examName],
-                  post,
-                  resultId: resultId,
-                  studentId: student.id,
+                  rollNumber: parseInt(rollNumber, 10),
                 },
-              });
+              },
+            });
+            if (!enrollment) {
+              if (resultPdf)
+                resultId = await uploadDriveFileToS3(
+                  resultPdf,
+                  "student-results"
+                );
+              if (resultId) {
+                await prisma.enrollment.create({
+                  data: {
+                    rollNumber: parseInt(rollNumber, 10),
+                    examId: exams[examName],
+                    post,
+                    resultId: resultId,
+                    studentId: student.id,
+                  },
+                });
+              }
             }
           } else {
             logger({
