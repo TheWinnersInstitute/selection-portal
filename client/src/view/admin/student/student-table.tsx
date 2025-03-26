@@ -1,0 +1,288 @@
+import { useData } from "@/context/DataContext";
+import React, { useMemo, useState } from "react";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+type Props = {
+  editHandler: (data: Student) => void;
+  total: number;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  studentsPerPage: number;
+  setStudentsPerPage: React.Dispatch<React.SetStateAction<number>>;
+};
+
+export default function StudentTable({
+  editHandler,
+  currentPage,
+  total,
+  setCurrentPage,
+  setStudentsPerPage,
+  studentsPerPage,
+}: Props) {
+  const [showViewStudentModel, setShowViewStudentModel] = useState(false);
+  const [currentStudent, setCurrentStudent] = useState<null | Student>(null);
+
+  const { students, setStudents } = useData();
+  const { apiClient } = useAuth();
+
+  const deleteHandler = async (id: string) => {
+    try {
+      await apiClient.delete(`/api/student/${id}`);
+      toast("Board deleted successfully");
+      setStudents((prev) => prev.filter((student) => student.id !== id));
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data?.message || "Something went wrong");
+      }
+    }
+  };
+
+  const totalPages = useMemo(() => {
+    return (
+      (total - (total % studentsPerPage)) / studentsPerPage +
+      (total % studentsPerPage === 0 ? 0 : 1)
+    );
+  }, [total, studentsPerPage]);
+
+  const startIndex = (currentPage - 1) * studentsPerPage;
+
+  const toggleViewStudent = () => setShowViewStudentModel((prev) => !prev);
+
+  return (
+    <>
+      {students.length > 0 && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>S.No.</TableHead>
+              <TableHead>Profile</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Mobile Number</TableHead>
+              <TableHead>Post</TableHead>
+              <TableHead>Exam</TableHead>
+              <TableHead>Roll number</TableHead>
+              {/* <TableHead>DOB</TableHead> */}
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {students
+              .slice(startIndex, startIndex + studentsPerPage)
+              .map((student, index) => {
+                const nameArray = student.name.split(" ");
+                return (
+                  <TableRow
+                    onClick={() => {
+                      // setCurrentStudent(student);
+                      // toggleViewStudent();
+                    }}
+                    key={student.id}
+                  >
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (student.image?.path) {
+                          window.open(
+                            student.image?.path,
+                            "_blank",
+                            "noopener,noreferrer"
+                          );
+                        }
+                      }}
+                    >
+                      <Avatar>
+                        <AvatarImage
+                          src={student.image?.path}
+                          alt={student.id}
+                        />
+                        <AvatarFallback>
+                          {nameArray[0]?.[0]}
+                          {nameArray[1]?.[0] || ""}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>{student.name}</TableCell>
+                    <TableCell>+91 {student.contactNumber}</TableCell>
+                    <TableCell
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (student.Enrollment?.[0]?.result) {
+                          window.open(
+                            student.Enrollment[0].result.path,
+                            "_blank",
+                            "noopener,noreferrer"
+                          );
+                        }
+                      }}
+                    >
+                      {student.Enrollment?.[0]?.post}
+                    </TableCell>
+                    <TableCell>{student.Enrollment?.[0]?.exam.name}</TableCell>
+                    <TableCell>{student.Enrollment?.[0]?.rollNumber}</TableCell>
+                    <TableCell
+                      onClick={(e) => e.stopPropagation()}
+                      className="space-x-1"
+                    >
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          editHandler(student);
+                        }}
+                        size="sm"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          deleteHandler(student.id);
+                        }}
+                        size="sm"
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      )}
+      <Pagination className="mt-3">
+        <PaginationContent className=" gap-3">
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => {
+                if (currentPage !== 1) {
+                  setCurrentPage((prev) => prev - 1);
+                }
+              }}
+            />
+          </PaginationItem>
+          {currentPage !== 1 && (
+            <PaginationItem
+              onClick={() => {
+                setCurrentPage((prev) => prev - 1);
+              }}
+            >
+              <PaginationLink href="#">{currentPage - 1}</PaginationLink>
+            </PaginationItem>
+          )}
+
+          <PaginationItem>
+            <PaginationLink href="#" isActive>
+              {currentPage}
+            </PaginationLink>
+          </PaginationItem>
+          {currentPage !== totalPages && (
+            <PaginationItem
+              onClick={() => {
+                setCurrentPage((prev) => prev + 1);
+              }}
+            >
+              {currentPage + 1}
+            </PaginationItem>
+          )}
+          <PaginationItem
+            onClick={() => {
+              if (currentPage !== totalPages) {
+                setCurrentPage((prev) => prev + 1);
+              }
+            }}
+          >
+            <PaginationNext />
+          </PaginationItem>
+          <Select
+            value={studentsPerPage.toString()}
+            onValueChange={(v) => setStudentsPerPage(parseInt(v, 10))}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue
+                placeholder="Students per page"
+                // defaultValue={studentsPerPage}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Students per page</SelectLabel>
+                {[5, 10, 20, 25, 50, 100, 1000].map((num) => {
+                  return (
+                    <SelectItem key={num} value={num.toString()}>
+                      {num}
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </PaginationContent>
+      </Pagination>
+
+      <Dialog open={showViewStudentModel} onOpenChange={toggleViewStudent}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{currentStudent?.name}</DialogTitle>
+          </DialogHeader>
+          <div>
+            <h3 className="font-semibold">Enrollments</h3>
+            {currentStudent?.Enrollment?.map((enrollment) => {
+              return (
+                <div key={enrollment.id}>
+                  <div className="flex justify-between items-center gap-1">
+                    <p>Post: {enrollment.post}</p>
+                    <p>Roll number: {enrollment.rollNumber}</p>
+                  </div>
+                  <div className="flex justify-between items-center gap-1">
+                    <p>Exam: {enrollment.exam.name}</p>
+                    <p>Roll number: {enrollment.result.path}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
