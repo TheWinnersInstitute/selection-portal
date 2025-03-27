@@ -81,6 +81,10 @@ export class RedisClient {
               candidatePhoto,
               "student-profiles"
             );
+            await prisma.student.update({
+              where: { id: student.id },
+              data: { imageId: profileId },
+            });
           }
 
           if (exams[examName]) {
@@ -107,6 +111,10 @@ export class RedisClient {
                   resultSsPdf,
                   "student-results"
                 );
+              await prisma.enrollment.update({
+                where: { id: enrollment.id },
+                data: { resultId },
+              });
             }
           } else {
             logger({
