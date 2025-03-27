@@ -42,6 +42,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useLoading } from "@/hooks/use-loading";
+import StudentTableRow from "./table-row";
 
 type Props = {
   editHandler: (data: Student) => void;
@@ -66,21 +67,6 @@ export default function StudentTable({
   const [currentStudent, setCurrentStudent] = useState<null | Student>(null);
 
   const { students, setStudents } = useData();
-  const { apiClient } = useAuth();
-
-  const deletingStudent = useLoading();
-
-  const deleteHandler = async (id: string) => {
-    try {
-      await apiClient.delete(`/api/student/${id}`);
-      toast("Student deleted successfully");
-      setStudents((prev) => prev.filter((student) => student.id !== id));
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast(error.response?.data?.message || "Something went wrong");
-      }
-    }
-  };
 
   const totalPages = useMemo(() => {
     return (
@@ -114,84 +100,13 @@ export default function StudentTable({
             {students
               .slice(startIndex, startIndex + studentsPerPage)
               .map((student, index) => {
-                const nameArray = student.name.split(" ");
                 return (
-                  <TableRow
-                    onClick={() => {
-                      // setCurrentStudent(student);
-                      // toggleViewStudent();
-                    }}
+                  <StudentTableRow
                     key={student.id}
-                  >
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (student.imageId) {
-                          window.open(
-                            `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${student.imageId}`,
-                            "_blank",
-                            "noopener,noreferrer"
-                          );
-                        }
-                      }}
-                    >
-                      <Avatar>
-                        <AvatarImage
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${student.imageId}`}
-                          alt={student.id}
-                        />
-                        <AvatarFallback>
-                          {nameArray[0]?.[0]}
-                          {nameArray[1]?.[0] || ""}
-                        </AvatarFallback>
-                      </Avatar>
-                    </TableCell>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell>+91 {student.contactNumber}</TableCell>
-                    <TableCell
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const resultId = student.Enrollment?.[0]?.resultId;
-                        if (resultId) {
-                          window.open(
-                            `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${resultId}`,
-                            "_blank",
-                            "noopener,noreferrer"
-                          );
-                        }
-                      }}
-                    >
-                      {student.Enrollment?.[0]?.post}
-                    </TableCell>
-                    <TableCell>{student.Enrollment?.[0]?.exam.name}</TableCell>
-                    <TableCell>{student.Enrollment?.[0]?.rollNumber}</TableCell>
-                    <TableCell
-                      onClick={(e) => e.stopPropagation()}
-                      className="space-x-1"
-                    >
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          editHandler(student);
-                        }}
-                        size="sm"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          deletingStudent.asyncWrapper(() =>
-                            deleteHandler(student.id)
-                          );
-                        }}
-                        size="sm"
-                      >
-                        {deletingStudent.loader || "Delete"}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                    editHandler={editHandler}
+                    index={studentsPerPage * (currentPage - 1) + index}
+                    student={student}
+                  />
                 );
               })}
           </TableBody>

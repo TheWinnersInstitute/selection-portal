@@ -73,6 +73,12 @@ export default function AdminStudentsPage() {
   }, [selectedExamId]);
 
   useEffect(() => {
+    console.log({
+      "students.length < currentPage * studentsPerPage":
+        students.length < currentPage * studentsPerPage,
+      "students.length !== total": students.length !== total,
+      isAuthenticated: isAuthenticated,
+    });
     if (
       students.length < currentPage * studentsPerPage &&
       students.length !== total &&
