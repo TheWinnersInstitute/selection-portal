@@ -17,6 +17,8 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
   const { apiClient, isAuthenticated } = useAuth();
 
   const downloadingStudentData = useLoading();
+  const uploadingFile = useLoading();
+
   const downloadingErroredData = useLoading();
 
   useEffect(() => {
@@ -38,24 +40,26 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
   }, [pooling, isAuthenticated]);
 
   const bulkUploadHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const file = e.target?.files?.[0];
-      if (!file) {
-        toast("Please attach file");
-        return;
+    uploadingFile.asyncWrapper(async () => {
+      try {
+        const file = e.target?.files?.[0];
+        if (!file) {
+          toast("Please attach file");
+          return;
+        }
+        const formData = new FormData();
+        formData.append("file", file);
+        const { data } = await apiClient.post("/api/student/bulk", formData, {
+          timeout: 600000,
+        });
+        setPooling(true);
+        setUnderProcess(data.data[0]);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast(error.response?.data?.message || "Something went wrong");
+        }
       }
-      setPooling(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      const { data } = await apiClient.post("/api/student/bulk", formData, {
-        timeout: 600000,
-      });
-      setUnderProcess(data.data[0]);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast(error.response?.data?.message || "Something went wrong");
-      }
-    }
+    });
   };
 
   const downloadErroredDataHandler = () => {
@@ -131,10 +135,11 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
         ref={bulkUploadInputRef}
       />
       <Button
-        disabled={pooling}
+        disabled={pooling || uploadingFile.loading}
         onClick={() => bulkUploadInputRef.current?.click()}
       >
-        {pooling ? `Processing ${underProcess}` : "Bulk upload"}
+        {uploadingFile.loader ||
+          (pooling ? `Processing ${underProcess}` : "Bulk upload")}
       </Button>
     </>
   );
