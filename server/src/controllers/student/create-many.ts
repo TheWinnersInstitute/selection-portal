@@ -53,7 +53,7 @@ export async function createStudents(
       return prev;
     }, {} as { [key: string]: string });
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 50; i++) {
       const row = sheetData[i];
       await RedisClient.Instance.addToQueue({
         row,

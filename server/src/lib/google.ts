@@ -78,6 +78,7 @@ export const uploadDriveFileToS3 = async (
         response.data.pipe(dest);
       }
     } catch (error) {
+      console.log(error);
       rej(error);
     }
   });
