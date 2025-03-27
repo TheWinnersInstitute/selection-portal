@@ -50,10 +50,11 @@ export class RedisClient {
             examName,
             mobileNumber,
             name,
-            candidatePhoto,
+            photo,
             post,
-            resultSsPdf,
+            result,
             rollNumber,
+            email,
           } = shapedObject;
 
           let student = await prisma.student.findUnique({
@@ -73,14 +74,12 @@ export class RedisClient {
                 name,
                 contactNumber: parseInt(mobileNumber, 10),
                 imageId: profileId,
+                email,
               },
             });
           }
-          if (student && !student.imageId && candidatePhoto) {
-            profileId = await uploadDriveFileToS3(
-              candidatePhoto,
-              "student-profiles"
-            );
+          if (student && !student.imageId && photo) {
+            profileId = await uploadDriveFileToS3(photo, "student-profiles");
             await prisma.student.update({
               where: { id: student.id },
               data: { imageId: profileId },
@@ -106,11 +105,8 @@ export class RedisClient {
                   studentId: student.id,
                 },
               });
-              if (enrollment && !enrollment.resultId && resultSsPdf)
-                resultId = await uploadDriveFileToS3(
-                  resultSsPdf,
-                  "student-results"
-                );
+              if (enrollment && !enrollment.resultId && result)
+                resultId = await uploadDriveFileToS3(result, "student-results");
               await prisma.enrollment.update({
                 where: { id: enrollment.id },
                 data: { resultId },

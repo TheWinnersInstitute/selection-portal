@@ -14,14 +14,15 @@ export async function downloadStudentsExcel(req: Request, res: Response) {
     const jsonData = students.flatMap((student) => {
       const studentData = {
         Name: student.name,
+        Email: student.email || "",
         MobileNumber: student.contactNumber.toString(),
         Photo: `${process.env.BACKEND_URL}/api/admin/assets/${student.imageId}`,
       };
       return student.Enrollment.map((enrollment) => {
         return {
           ...studentData,
-          "EXAM Name": enrollment.exam.name,
-          POST: enrollment.post,
+          "Exam Name": enrollment.exam.name,
+          Post: enrollment.post,
           "Roll Number": enrollment.rollNumber.toString(),
           Result: `${process.env.BACKEND_URL}/api/admin/assets/${enrollment.resultId}`,
         };
