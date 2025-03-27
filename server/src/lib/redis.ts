@@ -50,9 +50,9 @@ export class RedisClient {
             examName,
             mobileNumber,
             name,
-            photo,
+            candidatePhoto,
             post,
-            resultPdf,
+            resultSsPdf,
             rollNumber,
           } = shapedObject;
 
@@ -76,8 +76,11 @@ export class RedisClient {
               },
             });
           }
-          if (student && !student.imageId && photo) {
-            profileId = await uploadDriveFileToS3(photo, "student-profiles");
+          if (student && !student.imageId && candidatePhoto) {
+            profileId = await uploadDriveFileToS3(
+              candidatePhoto,
+              "student-profiles"
+            );
           }
 
           if (exams[examName]) {
@@ -99,9 +102,9 @@ export class RedisClient {
                   studentId: student.id,
                 },
               });
-              if (enrollment && !enrollment.resultId && resultPdf)
+              if (enrollment && !enrollment.resultId && resultSsPdf)
                 resultId = await uploadDriveFileToS3(
-                  resultPdf,
+                  resultSsPdf,
                   "student-results"
                 );
             }

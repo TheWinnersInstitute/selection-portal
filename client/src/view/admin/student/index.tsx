@@ -62,10 +62,14 @@ export default function AdminStudentsPage() {
     }
   };
 
-  useEffect(() => {
+  const triggerRefetchStudents = () => {
     setStudents([]);
     setCurrentPage(1);
     setTotal(-1);
+  };
+
+  useEffect(() => {
+    triggerRefetchStudents();
   }, [selectedExamId]);
 
   useEffect(() => {
@@ -85,6 +89,7 @@ export default function AdminStudentsPage() {
   return (
     <div>
       <Header
+        triggerRefetchStudents={triggerRefetchStudents}
         form={form}
         setEditData={setEditData}
         toggleAddBoardForm={toggleAddBoardForm}

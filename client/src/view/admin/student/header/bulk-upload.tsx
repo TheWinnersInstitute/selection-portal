@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { useData } from "@/context/DataContext";
 import { useLoading } from "@/hooks/use-loading";
 import { AxiosError } from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-export default function BulkUpload() {
+type Props = {
+  triggerRefetchStudents: () => void;
+};
+
+export default function BulkUpload({ triggerRefetchStudents }: Props) {
   const bulkUploadInputRef = useRef<HTMLInputElement>(null);
-  const [total, setTotal] = useState(0);
+  // const [total, setTotal] = useState(0);
   const [underProcess, setUnderProcess] = useState(0);
   const [pooling, setPooling] = useState(true);
   const { apiClient, isAuthenticated } = useAuth();
@@ -22,6 +25,7 @@ export default function BulkUpload() {
         const { data } = await apiClient.get("/api/student/bulk/status");
         setUnderProcess(data.data[0]);
         if (data.data[0] === 0) {
+          triggerRefetchStudents();
           setPooling(false);
         }
       }, 5000);
@@ -46,7 +50,6 @@ export default function BulkUpload() {
       const { data } = await apiClient.post("/api/student/bulk", formData, {
         timeout: 600000,
       });
-      setTotal(data.data[0]);
       setUnderProcess(data.data[0]);
     } catch (error) {
       if (error instanceof AxiosError) {

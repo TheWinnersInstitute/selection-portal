@@ -35,6 +35,7 @@ type Props = {
   setEditData: React.Dispatch<React.SetStateAction<Student | null>>;
   form: UseFormReturn<StudentFormValues, any, undefined>;
   setSelectedExamId: React.Dispatch<React.SetStateAction<string | null>>;
+  triggerRefetchStudents: () => void;
 };
 
 export default function Header({
@@ -44,6 +45,7 @@ export default function Header({
   setEditData,
   toggleAddBoardForm,
   setSelectedExamId,
+  triggerRefetchStudents,
 }: Props) {
   const { students, exams } = useData();
 
@@ -111,7 +113,7 @@ export default function Header({
             </SelectGroup>
           </SelectContent>
         </Select>
-        <BulkUpload />
+        <BulkUpload triggerRefetchStudents={triggerRefetchStudents} />
         {/* <Button onClick={downloadPfdHandler}>Download pdf</Button> */}
         <Dialog open={showAddBoardForm} onOpenChange={toggleAddBoardForm}>
           <Button
