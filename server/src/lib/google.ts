@@ -13,6 +13,16 @@ const auth = new google.auth.GoogleAuth({
 
 export const googleDrive = google.drive({ version: "v3", auth });
 
+export function toSnakeCase(filename: string) {
+  return filename
+    .replace(/\s+/g, "_")
+    .replace(/-/g, "_")
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
+    .replace(/\./g, "_")
+    .toLowerCase()
+    .replace(/_(?=[^_]*$)/, ".");
+}
+
 export const pipeFile = async (res: Response, url: string) => {
   const _url = new URL(url);
   const fileId = _url.searchParams.get("id");
@@ -60,7 +70,7 @@ export const uploadDriveFileToS3 = async (
           const s3Upload = await S3.instance.s3
             .upload({
               Bucket: process.env.AWS_S3_BUCKET as string,
-              Key: `${folder}/${fileId}_${fileMeta.name}`,
+              Key: `${folder}/${fileId}_${toSnakeCase(fileMeta.name)}`,
               Body: fs.createReadStream(tempFilePath),
               ContentType: fileMeta.mimeType,
             })

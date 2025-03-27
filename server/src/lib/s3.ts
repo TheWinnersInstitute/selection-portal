@@ -2,6 +2,7 @@ import AWS from "aws-sdk";
 import { S3Client } from "@aws-sdk/client-s3";
 import multer from "multer";
 import multerS3 from "multer-s3";
+import { toSnakeCase } from "./google";
 
 export class S3 {
   private static _instance: S3;
@@ -29,7 +30,10 @@ export class S3 {
           cb(null, { fieldName: file.fieldname });
         },
         key: function (req, file, cb) {
-          cb(null, `student-profiles/${Date.now()}_${file.originalname}`);
+          cb(
+            null,
+            `student-profiles/${Date.now()}_${toSnakeCase(file.originalname)}`
+          );
         },
       }),
     });
