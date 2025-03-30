@@ -29,6 +29,7 @@ studentRoutes.get(
       skip: z.string().max(4).optional(),
       take: z.string().max(4).optional(),
       examId: z.string().optional(),
+      q: z.string().max(100).optional(),
     }),
     "query"
   ),

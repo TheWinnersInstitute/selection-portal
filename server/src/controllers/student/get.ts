@@ -5,7 +5,7 @@ import { Prisma } from "@prisma/client";
 
 export async function getStudents(req: Request, res: Response): Promise<void> {
   try {
-    const { skip, examId, take } = req.query;
+    const { skip, examId, take, q } = req.query;
 
     const where: Prisma.StudentWhereInput = {};
     if (typeof examId === "string") {
@@ -14,6 +14,16 @@ export async function getStudents(req: Request, res: Response): Promise<void> {
           examId,
         },
       };
+    }
+
+    if (typeof q === "string") {
+      where.OR = [
+        { name: { contains: q, mode: "insensitive" } },
+        { email: { contains: q, mode: "insensitive" } },
+        { city: { contains: q, mode: "insensitive" } },
+        { state: { contains: q, mode: "insensitive" } },
+        { fatherName: { contains: q, mode: "insensitive" } },
+      ];
     }
 
     const total = await prisma.student.count({

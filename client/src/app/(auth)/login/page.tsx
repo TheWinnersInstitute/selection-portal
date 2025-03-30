@@ -27,7 +27,7 @@ export default function LoginServer() {
   const { isAuthenticated, login } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) router.push("/");
+    if (isAuthenticated) router.push("/admin/student");
   }, [isAuthenticated]);
 
   const loginHandler = async () => {

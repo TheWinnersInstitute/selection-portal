@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
 import { AxiosError } from "axios";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { z } from "zod";
@@ -19,14 +19,18 @@ import { useLoading } from "@/hooks/use-loading";
 // export const STUDENTS_PER_PAGE = 5;
 
 export default function AdminStudentsPage() {
-  const { apiClient, isAuthenticated } = useAuth();
+  const searchTimeout = useRef<NodeJS.Timeout>(null);
+
   const [showAddBoardForm, setShowAddBoardForm] = useState(false);
-  const { setStudents, students } = useData();
   const [editData, setEditData] = useState<null | Student>(null);
   const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(-1);
   const [studentsPerPage, setStudentsPerPage] = useState(25);
+  const [search, setSearch] = useState("");
+
+  const { apiClient, isAuthenticated } = useAuth();
+  const { setStudents, students } = useData();
 
   const fetchingStudents = useLoading();
 
@@ -43,11 +47,17 @@ export default function AdminStudentsPage() {
     },
   });
 
-  const fetchStudents = async (skip: number, examId: string | null) => {
+  const fetchStudents = async (
+    skip: number,
+    examId: string | null,
+    q?: string
+  ) => {
+    if (fetchingStudents.loading) return;
     try {
       const { data } = await apiClient.get("/api/student", {
         params: {
           ...(examId ? { examId } : {}),
+          ...(q ? { q } : {}),
           skip,
           take: studentsPerPage,
         },
@@ -69,25 +79,26 @@ export default function AdminStudentsPage() {
 
   useEffect(() => {
     triggerRefetchStudents();
-  }, [selectedExamId]);
+  }, [selectedExamId, search]);
 
   useEffect(() => {
-    console.log({
-      "students.length < currentPage * studentsPerPage":
-        students.length < currentPage * studentsPerPage,
-      "students.length !== total": students.length !== total,
-      isAuthenticated: isAuthenticated,
-    });
     if (
       students.length < currentPage * studentsPerPage &&
       students.length !== total &&
       isAuthenticated
     ) {
       fetchingStudents.asyncWrapper(() =>
-        fetchStudents(students.length, selectedExamId)
+        fetchStudents(students.length, selectedExamId, search)
       );
     }
   }, [currentPage, total, studentsPerPage, isAuthenticated]);
+
+  const searchHandler = (q: string) => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      setSearch(q);
+    }, 500);
+  };
 
   const toggleAddBoardForm = () => setShowAddBoardForm((prev) => !prev);
 
@@ -101,6 +112,7 @@ export default function AdminStudentsPage() {
         editData={editData}
         showAddBoardForm={showAddBoardForm}
         setSelectedExamId={setSelectedExamId}
+        searchHandler={searchHandler}
       />
       <StudentTable
         editHandler={(student) => {

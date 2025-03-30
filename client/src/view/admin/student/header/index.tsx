@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 type Props = {
   showAddBoardForm: boolean;
@@ -36,6 +37,7 @@ type Props = {
   form: UseFormReturn<StudentFormValues, any, undefined>;
   setSelectedExamId: React.Dispatch<React.SetStateAction<string | null>>;
   triggerRefetchStudents: () => void;
+  searchHandler: (q: string) => void;
 };
 
 export default function Header({
@@ -46,8 +48,9 @@ export default function Header({
   toggleAddBoardForm,
   setSelectedExamId,
   triggerRefetchStudents,
+  searchHandler,
 }: Props) {
-  const { students, exams } = useData();
+  const { exams } = useData();
 
   // const downloadPfdHandler = async () => {
   //   const doc = new jsPDF();
@@ -86,8 +89,11 @@ export default function Header({
   //   }
   // };
   return (
-    <div className="flex justify-between items-center pt-3 mb-3">
-      <h2>Students</h2>
+    <div className="flex justify-between items-center gap-3 pt-3 mb-3">
+      <Input
+        placeholder="Search..."
+        onChange={(e) => searchHandler(e.target.value)}
+      />
       <div className="flex items-center gap-3">
         <Select
           onValueChange={(value) => {
