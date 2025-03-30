@@ -295,13 +295,16 @@ export default function AdminExamsPage() {
           </DialogContent>
         </Dialog>
       </div>
+      {exams.length === 0 && (
+        <p className="flex justify-center my-1">No data</p>
+      )}
       {exams.length > 0 && (
         <Table>
-          <TableCaption>A list of your recent invoices.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>S.No.</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Total selections</TableHead>
               <TableHead>Board</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Actions</TableHead>
@@ -312,6 +315,7 @@ export default function AdminExamsPage() {
               <TableRow key={exam.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{exam.name}</TableCell>
+                <TableCell>{exam.enrollmentCount}</TableCell>
                 <TableCell>{boardsMap[exam.boardId].name}</TableCell>
                 <TableCell>{exam.description.slice(0, 40) || " "}</TableCell>
                 <TableCell className="space-x-1">

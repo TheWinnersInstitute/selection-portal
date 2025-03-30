@@ -37,10 +37,12 @@ import { useLoading } from "@/hooks/use-loading";
 
 export const studentFormSchema = z.object({
   name: z.string().max(100).min(1),
-  email: z.string().email().optional(),
+  email: z.string().optional(),
   city: z.string().max(100).optional(),
   contactNumber: z.string().length(10),
-  dateOfBirth: z.date().optional(),
+  year: z.string().optional(),
+  month: z.string().optional(),
+  date: z.string().optional(),
   fatherName: z.string().max(100).optional(),
   state: z.string().max(100).optional(),
 });
@@ -74,8 +76,11 @@ export default function StudentForm({
       try {
         const formData = new FormData();
         if (editData) formData.append("id", editData.id);
-        if (values.dateOfBirth)
-          formData.append("dateOfBirth", values.dateOfBirth.toISOString());
+        if (values.year && values.date && values.month)
+          formData.append(
+            "dateOfBirth",
+            `${values.year}-${values.month}-${values.date}`
+          );
         if (values.city) formData.append("city", values.city);
         if (values.state) formData.append("state", values.state);
         if (values.contactNumber)
@@ -99,10 +104,10 @@ export default function StudentForm({
               return student;
             })
           );
-          toggleAddBoardForm();
         } else {
           setStudents((prev) => [...prev, data.data[0]]);
         }
+        toggleAddBoardForm();
       } catch (error) {
         if (error instanceof AxiosError) {
           toast(error.response?.data?.message || "Something went wrong");
@@ -130,6 +135,38 @@ export default function StudentForm({
       setProfile(files[0]);
     }
   };
+
+  const dateInputs = useMemo(() => {
+    return [
+      {
+        name: "year" as keyof StudentFormValues,
+        title: "Birth Year",
+        options: Array(30)
+          .fill(0)
+          .map((_, index) => {
+            return (new Date().getFullYear() - index + 1 - 10).toString();
+          }),
+      },
+      {
+        name: "month" as keyof StudentFormValues,
+        title: "Birth Month",
+        options: Array(12)
+          .fill(0)
+          .map((_, index) => {
+            return (index + 1).toString();
+          }),
+      },
+      {
+        name: "date" as keyof StudentFormValues,
+        title: "Birth Date",
+        options: Array(31)
+          .fill(0)
+          .map((_, index) => {
+            return (index + 1).toString();
+          }),
+      },
+    ];
+  }, []);
 
   return (
     <>
@@ -237,8 +274,8 @@ export default function StudentForm({
               <FormItem>
                 <FormLabel>Contact number</FormLabel>
                 <FormControl>
-                  <div className="flex items-center">
-                    <Button type="button" size="sm">
+                  <div className="flex items-center gap-2">
+                    <Button disabled type="button" size="sm">
                       +91
                     </Button>
                     <Input placeholder="Enter contact number" {...field} />
@@ -263,54 +300,45 @@ export default function StudentForm({
             )}
           />
 
-          {/* <FormField
-            control={form.control}
-            name="postAllotment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Post allotment</FormLabel>
-                <FormControl>
-                  <Input placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
-
-          <FormField
-            control={form.control}
-            name="dateOfBirth"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date of birth</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button variant={"outline"}>
-                        {field.value ? (
-                          format(field.value || new Date().toString(), "P")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      defaultMonth={new Date(2000, 10)}
-                      mode="single"
-                      selected={new Date(field.value || "")}
-                      onSelect={field.onChange}
-                      disabled={(date) => date > new Date()}
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex justify-between items-center gap-2">
+            {dateInputs.map((input) => {
+              return (
+                <FormField
+                  key={input.name}
+                  control={form.control}
+                  name={input.name}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>{input.title}</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a city" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {input.options.map((num, index) => {
+                            return (
+                              <SelectItem
+                                value={num}
+                                key={`${index + 1}-${num}`}
+                              >
+                                {num}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              );
+            })}
+          </div>
 
           <DialogFooter className="justify-between">
             <DialogClose asChild>

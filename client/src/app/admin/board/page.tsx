@@ -186,13 +186,16 @@ export default function AdminBoardPage() {
           </DialogContent>
         </Dialog>
       </div>
+      {boards.length === 0 && (
+        <p className="flex justify-center my-1">No data</p>
+      )}
       {boards.length > 0 && (
         <Table>
-          <TableCaption>A list of your recent invoices.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>S.No.</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Total Selections</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -202,6 +205,7 @@ export default function AdminBoardPage() {
               <TableRow key={board.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{board.name}</TableCell>
+                <TableCell>{board.enrollmentCount}</TableCell>
                 <TableCell>{board.description.slice(0, 40)}</TableCell>
                 <TableCell className="space-x-2">
                   <Button

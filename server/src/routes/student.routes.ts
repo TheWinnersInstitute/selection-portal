@@ -14,6 +14,10 @@ import { checkReturnPayload } from "../middleware/checkRequestPayload";
 import { z } from "zod";
 import { S3, studentBulkUpload } from "../lib/s3";
 import { downloadStudentsExcel } from "../controllers/student/download";
+import {
+  createEnrollment,
+  deleteEnrollment,
+} from "../controllers/student/enrollment";
 
 export const studentRoutes = Router();
 studentRoutes.get(
@@ -39,7 +43,7 @@ studentRoutes.post(
   checkReturnPayload(
     z.object({
       name: z.string().max(100).min(1),
-      email: z.string().email().max(100).min(1),
+      email: z.string().optional(),
       city: z.string().max(100).optional(),
       contactNumber: z.string().max(100).optional(),
       dateOfBirth: z.string().optional(),
@@ -73,7 +77,7 @@ studentRoutes.patch(
     z.object({
       id: z.string().uuid(),
       name: z.string().max(100).min(1),
-      email: z.string().email().max(100).min(1),
+      email: z.string().optional(),
       city: z.string().max(100).optional(),
       contactNumber: z.string().max(100).optional(),
       dateOfBirth: z.string().optional(),
@@ -96,3 +100,35 @@ studentRoutes.post(
 studentRoutes.get("/bulk-error", checkAuth, checkAdmin, downloadErroredData);
 studentRoutes.get("/bulk", checkAuth, checkAdmin, downloadStudentsExcel);
 studentRoutes.get("/bulk/status", checkAuth, checkAdmin, queueStatus);
+
+studentRoutes.post(
+  "/enrollment",
+  checkAuth,
+  checkAdmin,
+  S3.instance.uploadResult.single("file"),
+  checkReturnPayload(
+    z.object({
+      studentId: z.string({ message: "Student is required" }).uuid(),
+      post: z.string({ message: "Post is required" }).max(100).min(1),
+      rollNumber: z
+        .string({ message: "Roll number is required" })
+        .max(100)
+        .min(1),
+      rank: z.string().optional(),
+      examId: z.string({ message: "Exam is required" }).uuid(),
+    })
+  ),
+  createEnrollment
+);
+studentRoutes.delete(
+  "/enrollment/:id",
+  checkAuth,
+  checkAdmin,
+  checkReturnPayload(
+    z.object({
+      id: z.string().uuid(),
+    }),
+    "params"
+  ),
+  deleteEnrollment
+);

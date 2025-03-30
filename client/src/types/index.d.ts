@@ -2,6 +2,7 @@ type Board = {
   id: string;
   name: string;
   description: string;
+  enrollmentCount: number;
 };
 
 type Exam = {
@@ -13,8 +14,10 @@ type Exam = {
   boardId: string;
   description: string;
   examDate: Date;
+  enrollmentCount: number;
   examStatus: "pending" | "ongoing" | "completed";
 };
+
 type Student = {
   id: string;
   email: string;
@@ -29,24 +32,17 @@ type Student = {
   postAllotment: string | null;
   imageId: string | null;
   // image: Asset | null;
-  Enrollment:
-    | {
-        id: string;
-        post: string | null;
-        rollNumber: bigint;
-        createdAt: Date;
-        updatedAt: Date;
-        resultId: string | null;
-        studentId: string;
-        examId: string;
-        // result: Asset;
-        exam: Exam;
-      }[]
-    | null;
+  Enrollment: Enrollment[] | null;
 };
 
-// type Asset = {
-//   id: string;
-//   path: string;
-//   type: string;
-// };
+type Enrollment = {
+  id: string;
+  post: string | null;
+  rollNumber: bigint;
+  createdAt: Date;
+  updatedAt: Date;
+  resultId: string | null;
+  studentId: string;
+  examId: string;
+  exam: Exam;
+};

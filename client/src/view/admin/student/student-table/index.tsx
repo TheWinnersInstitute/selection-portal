@@ -4,8 +4,6 @@ import React, { useMemo, useState } from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -14,18 +12,12 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "sonner";
-import { AxiosError } from "axios";
 import {
   Select,
   SelectContent,
@@ -35,14 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useLoading } from "@/hooks/use-loading";
+
 import StudentTableRow from "./table-row";
+import Enrollments from "./enrollments";
 
 type Props = {
   editHandler: (data: Student) => void;
@@ -66,7 +53,7 @@ export default function StudentTable({
   const [showViewStudentModel, setShowViewStudentModel] = useState(false);
   const [currentStudent, setCurrentStudent] = useState<null | Student>(null);
 
-  const { students, setStudents } = useData();
+  const { students } = useData();
 
   const totalPages = useMemo(() => {
     return (
@@ -81,6 +68,9 @@ export default function StudentTable({
 
   return (
     <>
+      {students.length === 0 && (
+        <p className="flex justify-center my-1">No data</p>
+      )}
       {students.length > 0 && (
         <Table>
           <TableHeader>
@@ -89,10 +79,10 @@ export default function StudentTable({
               <TableHead>Profile</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Mobile Number</TableHead>
-              <TableHead>Post</TableHead>
-              <TableHead>Exam</TableHead>
-              <TableHead>Roll number</TableHead>
-              {/* <TableHead>DOB</TableHead> */}
+              <TableHead>Email</TableHead>
+              <TableHead>DOB</TableHead>
+              <TableHead className="text-center">Total selections</TableHead>
+              {/* <TableHead>Roll number</TableHead> */}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -106,6 +96,10 @@ export default function StudentTable({
                     editHandler={editHandler}
                     index={studentsPerPage * (currentPage - 1) + index}
                     student={student}
+                    onClick={() => {
+                      setCurrentStudent(student);
+                      toggleViewStudent();
+                    }}
                   />
                 );
               })}
@@ -184,31 +178,12 @@ export default function StudentTable({
           </Select>
         </PaginationContent>
       </Pagination>
-
-      <Dialog open={showViewStudentModel} onOpenChange={toggleViewStudent}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{currentStudent?.name}</DialogTitle>
-          </DialogHeader>
-          <div>
-            <h3 className="font-semibold">Enrollments</h3>
-            {currentStudent?.Enrollment?.map((enrollment) => {
-              return (
-                <div key={enrollment.id}>
-                  <div className="flex justify-between items-center gap-1">
-                    <p>Post: {enrollment.post}</p>
-                    <p>Roll number: {enrollment.rollNumber}</p>
-                  </div>
-                  <div className="flex justify-between items-center gap-1">
-                    <p>Exam: {enrollment.exam.name}</p>
-                    {/* <p>Roll number: {enrollment.result.path}</p> */}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <Enrollments
+        currentStudent={currentStudent}
+        showViewStudentModel={showViewStudentModel}
+        toggleViewStudent={toggleViewStudent}
+        setCurrentStudent={setCurrentStudent}
+      />
     </>
   );
 }

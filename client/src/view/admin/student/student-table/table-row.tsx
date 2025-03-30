@@ -16,16 +16,19 @@ import { useLoading } from "@/hooks/use-loading";
 import { toast } from "sonner";
 import { useData } from "@/context/DataContext";
 import { AxiosError } from "axios";
+import { format } from "date-fns";
 
 type Props = {
   student: Student;
   index: number;
   editHandler: (data: Student) => void;
+  onClick?: () => void;
 };
 export default function StudentTableRow({
   student,
   index,
   editHandler,
+  onClick,
 }: Props) {
   const nameArray = student.name.split(" ");
 
@@ -46,7 +49,7 @@ export default function StudentTableRow({
     }
   };
   return (
-    <TableRow>
+    <TableRow onClick={onClick}>
       <TableCell>{index + 1}</TableCell>
       <TableCell
         onClick={(e) => {
@@ -73,7 +76,14 @@ export default function StudentTableRow({
       </TableCell>
       <TableCell>{student.name}</TableCell>
       <TableCell>+91 {student.contactNumber}</TableCell>
-      <TableCell
+      <TableCell>{student.email || "-"}</TableCell>
+      <TableCell>
+        {student.dateOfBirth
+          ? format(new Date(student.dateOfBirth), "PPP")
+          : "-"}
+      </TableCell>
+
+      {/* <TableCell
         className={student.Enrollment?.[0]?.resultId ? "text-blue-500" : ""}
         onClick={(e) => {
           e.stopPropagation();
@@ -87,10 +97,15 @@ export default function StudentTableRow({
           }
         }}
       >
-        {student.Enrollment?.[0]?.post}
+        {student.Enrollment?.[0]?.post}{" "}
+        {student.Enrollment && student.Enrollment?.length > 0
+          ? `(${student.Enrollment?.length})`
+          : "-"}
+      </TableCell> */}
+      <TableCell className="text-center">
+        {student.Enrollment?.length || "-"}
       </TableCell>
-      <TableCell>{student.Enrollment?.[0]?.exam.name}</TableCell>
-      <TableCell>{student.Enrollment?.[0]?.rollNumber}</TableCell>
+      {/* <TableCell>{student.Enrollment?.[0]?.rollNumber || "-"}</TableCell> */}
       <TableCell onClick={(e) => e.stopPropagation()} className="space-x-1">
         <Button
           variant="outline"
