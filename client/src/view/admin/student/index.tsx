@@ -37,7 +37,6 @@ export default function AdminStudentsPage() {
       city: "",
       name: "",
       contactNumber: "",
-      dateOfBirth: new Date(),
       fatherName: "",
       // postAllotment: "",
       state: "Madhya Pradesh",
@@ -109,8 +108,12 @@ export default function AdminStudentsPage() {
           form.setValue("name", student.name);
           form.setValue("city", student.city || "");
           form.setValue("contactNumber", student.contactNumber || "");
+
           if (student.dateOfBirth) {
-            form.setValue("dateOfBirth", new Date(student.dateOfBirth || ""));
+            const dob = new Date(student.dateOfBirth);
+            form.setValue("year", dob.getFullYear().toString());
+            form.setValue("date", dob.getDate().toString());
+            form.setValue("month", (dob.getMonth() + 1).toString());
           }
           form.setValue("email", student.email || "");
           form.setValue("fatherName", student.fatherName || "");
