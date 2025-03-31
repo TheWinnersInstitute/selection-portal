@@ -40,7 +40,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CalendarIcon, Pencil } from "lucide-react";
+import { CalendarIcon, Pen, Pencil, Trash2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -298,56 +298,49 @@ export default function AdminExamsPage() {
       {exams.length === 0 && (
         <p className="flex justify-center my-1">No data</p>
       )}
-      {exams.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>S.No.</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Total selections</TableHead>
-              <TableHead>Board</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {exams.map((exam, index) => (
-              <TableRow key={exam.id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{exam.name}</TableCell>
-                <TableCell>{exam.enrollmentCount}</TableCell>
-                <TableCell>{boardsMap[exam.boardId].name}</TableCell>
-                <TableCell>{exam.description.slice(0, 40) || " "}</TableCell>
-                <TableCell className="space-x-1">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setEditData(exam);
-                      form.setValue("name", exam.name);
-                      form.setValue("description", exam.description);
-                      form.setValue("boardId", exam.boardId);
-                      form.setValue("examDate", new Date(exam.examDate));
-                      toggleAddBoardForm();
-                    }}
-                    size="sm"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      deleteHandler(exam.id);
-                    }}
-                    size="sm"
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+      <div className="flex justify-between flex-wrap gap-5  mt-5">
+        {exams.map((exam) => {
+          return (
+            <div
+              className="bg-secondary px-5 py-3 rounded-sm flex-1 flex flex-col max-w-1/3"
+              key={exam.id}
+            >
+              <h2 className="text-xl font-bold">
+                {exam.name} ({exam.enrollmentCount})
+              </h2>
+              <p className="text-sm">{boardsMap[exam.boardId]?.name}</p>
+              <p className="text-xs opacity-60">{exam.description}</p>
+              <div className="flex-1"></div>
+              <div className="flex justify-between items-center mt-3 gap-2">
+                <Button
+                  onClick={() => {
+                    setEditData(exam);
+                    form.setValue("name", exam.name);
+                    form.setValue("description", exam.description);
+                    form.setValue("boardId", exam.boardId);
+                    form.setValue("examDate", new Date(exam.examDate));
+                    toggleAddBoardForm();
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                  size="sm"
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => {
+                    deleteHandler(exam.id);
+                  }}
+                  className="flex-1"
+                  size="sm"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

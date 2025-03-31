@@ -13,6 +13,7 @@ import { useLoading } from "@/hooks/use-loading";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { Trash2 } from "lucide-react";
 
 type Props = {
   enrollment: Enrollment;
@@ -39,9 +40,9 @@ export default function EnrollmentRow({ enrollment, index, onDelete }: Props) {
 
   return (
     <TableRow>
-      <TableCell>{index + 1}</TableCell>
+      {/* <TableCell>{index + 1}</TableCell> */}
       <TableCell
-        className={enrollment?.resultId ? "text-blue-500" : ""}
+        className={`${enrollment?.resultId ? "text-blue-500" : ""}`}
         onClick={(e) => {
           e.stopPropagation();
           const resultId = enrollment?.resultId;
@@ -54,21 +55,27 @@ export default function EnrollmentRow({ enrollment, index, onDelete }: Props) {
           }
         }}
       >
-        {enrollment.post}
+        <div className="w-20">{enrollment.post}</div>
       </TableCell>
-      {/* @ts-ignore */}
-      <TableCell>{enrollment.rank}</TableCell>
-      <TableCell>{enrollment.exam.name.slice(0, 15)}</TableCell>
-      <TableCell>{enrollment.rollNumber}</TableCell>
+      <TableCell>
+        {/* @ts-ignore */}
+        <div className="w-10">{enrollment.rank || "-"}</div>
+      </TableCell>
+      <TableCell>
+        <div className="w-20">{enrollment.exam.name.slice(0, 15)}</div>
+      </TableCell>
+      <TableCell>
+        <div className="w-20">{enrollment.rollNumber}</div>
+      </TableCell>
       <TableCell>
         <Button
           variant="outline"
           onClick={() => {
             deleteHandler(enrollment.id);
           }}
-          size="sm"
+          size="icon"
         >
-          {deleting.loader || "Delete"}
+          {deleting.loader || <Trash2 />}
         </Button>
       </TableCell>
     </TableRow>

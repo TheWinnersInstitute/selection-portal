@@ -20,7 +20,7 @@ export default function EnrollmentsList({ student, setCurrentStudent }: Props) {
   return (
     <div>
       <Table>
-        <TableHeader>
+        {/* <TableHeader>
           <TableRow>
             <TableHead>S.No.</TableHead>
             <TableHead>Post</TableHead>
@@ -29,7 +29,7 @@ export default function EnrollmentsList({ student, setCurrentStudent }: Props) {
             <TableHead>Roll number</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
-        </TableHeader>
+        </TableHeader> */}
         <TableBody>
           {student.Enrollment?.map((enrollment, index) => {
             return (

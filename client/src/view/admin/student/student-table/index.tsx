@@ -68,7 +68,7 @@ export default function StudentTable({
 
   return (
     <>
-      {students.length === 0 && (
+      {students.length === 0 && !loader && (
         <p className="flex justify-center my-1">No data</p>
       )}
       {students.length > 0 && (
@@ -79,10 +79,18 @@ export default function StudentTable({
               <TableHead>Profile</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Mobile Number</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>DOB</TableHead>
-              <TableHead className="text-center">Total selections</TableHead>
-              {/* <TableHead>Roll number</TableHead> */}
+              <TableHead className="text-center">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Post</TableHead>
+                      <TableHead className="text-center">Rank</TableHead>
+                      <TableHead>Exam</TableHead>
+                      <TableHead>Roll number</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                </Table>
+              </TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -93,6 +101,8 @@ export default function StudentTable({
                 return (
                   <StudentTableRow
                     key={student.id}
+                    currentStudent={currentStudent}
+                    setCurrentStudent={setCurrentStudent}
                     editHandler={editHandler}
                     index={studentsPerPage * (currentPage - 1) + index}
                     student={student}

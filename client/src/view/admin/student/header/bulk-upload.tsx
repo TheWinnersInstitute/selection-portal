@@ -30,7 +30,7 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
           triggerRefetchStudents();
           setPooling(false);
         }
-      }, 5000);
+      }, 2000);
 
       return () => {
         clearInterval(interval);
@@ -120,11 +120,11 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
 
   return (
     <>
+      <Button onClick={downloadStudentsDataHandler}>
+        {downloadingStudentData.loader || "Download excel"}
+      </Button>
       <Button onClick={downloadErroredDataHandler}>
         {downloadingErroredData.loader || "Download errored data"}
-      </Button>
-      <Button onClick={downloadStudentsDataHandler}>
-        {downloadingStudentData.loader || "Download students data"}
       </Button>
       <input
         multiple={false}

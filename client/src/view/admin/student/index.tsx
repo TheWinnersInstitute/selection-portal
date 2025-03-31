@@ -20,7 +20,7 @@ import { useLoading } from "@/hooks/use-loading";
 
 export default function AdminStudentsPage() {
   const searchTimeout = useRef<NodeJS.Timeout>(null);
-
+  const first = useRef(true);
   const [showAddBoardForm, setShowAddBoardForm] = useState(false);
   const [editData, setEditData] = useState<null | Student>(null);
   const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
@@ -78,7 +78,10 @@ export default function AdminStudentsPage() {
   };
 
   useEffect(() => {
-    triggerRefetchStudents();
+    if (!first.current) {
+      triggerRefetchStudents();
+      first.current = false;
+    }
   }, [selectedExamId, search]);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 
-export function useLoading() {
-  const [loading, setLoading] = useState(false);
+export function useLoading(initialState = false) {
+  const [loading, setLoading] = useState(initialState);
 
   const asyncWrapper = async (cb: () => Promise<any>) => {
     setLoading(true);

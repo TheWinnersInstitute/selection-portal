@@ -189,6 +189,48 @@ export default function AdminBoardPage() {
       {boards.length === 0 && (
         <p className="flex justify-center my-1">No data</p>
       )}
+      <div className="flex justify-between flex-wrap gap-5  mt-5">
+        {boards.map((board) => {
+          return (
+            <div
+              className="bg-secondary px-5 py-3 rounded-sm flex-1 flex flex-col max-w-1/3"
+              key={board.id}
+            >
+              <h2 className="text-xl font-bold">
+                {board.name} ({board.enrollmentCount})
+              </h2>
+              {/* <p className="text-sm">{boardsMap[exam.boardId]?.name}</p> */}
+              <p className="text-xs opacity-60">{board.description}</p>
+              <div className="flex-1"></div>
+              <div className="flex  justify-between items-center mt-3 gap-2">
+                <Button
+                  onClick={() => {
+                    setEditData(board);
+                    form.setValue("name", board.name);
+                    form.setValue("description", board.description);
+                    toggleAddBoardForm();
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                  size="sm"
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => {
+                    deleteHandler(board.id);
+                  }}
+                  className="flex-1"
+                  size="sm"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {/*       
       {boards.length > 0 && (
         <Table>
           <TableHeader>
@@ -234,7 +276,7 @@ export default function AdminBoardPage() {
             ))}
           </TableBody>
         </Table>
-      )}
+      )} */}
     </div>
   );
 }

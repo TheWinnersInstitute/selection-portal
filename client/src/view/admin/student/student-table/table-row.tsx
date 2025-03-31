@@ -17,18 +17,25 @@ import { toast } from "sonner";
 import { useData } from "@/context/DataContext";
 import { AxiosError } from "axios";
 import { format } from "date-fns";
+import EnrollmentsList from "./enrollments/enrollments-list";
+import { Download, Pen, Trash2 } from "lucide-react";
+import { studentPdf } from "@/lib/utils";
 
 type Props = {
   student: Student;
   index: number;
   editHandler: (data: Student) => void;
   onClick?: () => void;
+  currentStudent: Student | null;
+  setCurrentStudent: (data: Student | null) => void;
 };
 export default function StudentTableRow({
   student,
   index,
   editHandler,
   onClick,
+  currentStudent,
+  setCurrentStudent,
 }: Props) {
   const nameArray = student.name.split(" ");
 
@@ -36,6 +43,7 @@ export default function StudentTableRow({
   const { apiClient } = useAuth();
 
   const deletingStudent = useLoading();
+  const downloadingPdf = useLoading();
 
   const deleteHandler = async (id: string) => {
     try {
@@ -48,6 +56,13 @@ export default function StudentTableRow({
       }
     }
   };
+
+  const downloadStudentPdf = () => {
+    downloadingPdf.asyncWrapper(async () => {
+      await studentPdf([student]);
+    });
+  };
+
   return (
     <TableRow onClick={onClick}>
       <TableCell>{index + 1}</TableCell>
@@ -76,54 +91,33 @@ export default function StudentTableRow({
       </TableCell>
       <TableCell>{student.name}</TableCell>
       <TableCell>+91 {student.contactNumber}</TableCell>
-      <TableCell>{student.email || "-"}</TableCell>
-      <TableCell>
-        {student.dateOfBirth
-          ? format(new Date(student.dateOfBirth), "PPP")
-          : "-"}
+      <TableCell onClick={(e) => e.stopPropagation()}>
+        <EnrollmentsList
+          student={student}
+          setCurrentStudent={setCurrentStudent}
+        />
       </TableCell>
-
-      {/* <TableCell
-        className={student.Enrollment?.[0]?.resultId ? "text-blue-500" : ""}
-        onClick={(e) => {
-          e.stopPropagation();
-          const resultId = student.Enrollment?.[0]?.resultId;
-          if (resultId) {
-            window.open(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${resultId}`,
-              "_blank",
-              "noopener,noreferrer"
-            );
-          }
-        }}
-      >
-        {student.Enrollment?.[0]?.post}{" "}
-        {student.Enrollment && student.Enrollment?.length > 0
-          ? `(${student.Enrollment?.length})`
-          : "-"}
-      </TableCell> */}
-      <TableCell className="text-center">
-        {student.Enrollment?.length || "-"}
-      </TableCell>
-      {/* <TableCell>{student.Enrollment?.[0]?.rollNumber || "-"}</TableCell> */}
-      <TableCell onClick={(e) => e.stopPropagation()} className="space-x-1">
+      <TableCell onClick={(e) => e.stopPropagation()} className="space-x-1 ">
         <Button
           variant="outline"
           onClick={() => {
             editHandler(student);
           }}
-          size="sm"
+          size="icon"
         >
-          Edit
+          <Pen />
         </Button>
         <Button
           variant="outline"
           onClick={() => {
             deletingStudent.asyncWrapper(() => deleteHandler(student.id));
           }}
-          size="sm"
+          size="icon"
         >
-          {deletingStudent.loader || "Delete"}
+          {deletingStudent.loader || <Trash2 />}
+        </Button>
+        <Button variant="outline" onClick={downloadStudentPdf} size="icon">
+          {downloadingPdf.loader || <Download />}
         </Button>
       </TableCell>
     </TableRow>

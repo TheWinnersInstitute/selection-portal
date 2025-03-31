@@ -14,7 +14,7 @@ import React from "react";
 import StudentForm, { StudentFormValues } from "./student-form";
 import jsPDF from "jspdf";
 import { useData } from "@/context/DataContext";
-import { getBase64Image } from "@/lib/utils";
+import { getBase64Image, studentPdf } from "@/lib/utils";
 import { toast } from "sonner";
 import BulkUpload from "./bulk-upload";
 import { UseFormReturn } from "react-hook-form";
@@ -28,6 +28,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { useLoading } from "@/hooks/use-loading";
+import { useAuth } from "@/context/AuthContext";
 
 type Props = {
   showAddBoardForm: boolean;
@@ -51,43 +53,21 @@ export default function Header({
   searchHandler,
 }: Props) {
   const { exams } = useData();
+  const { apiClient } = useAuth();
 
-  // const downloadPfdHandler = async () => {
-  //   const doc = new jsPDF();
+  const downloadingPdf = useLoading();
 
-  //   let index = 0;
-  //   const imageWidth = 100;
-  //   const imageHeight = 100;
-  //   for (const student of students) {
-  //     if (student.image) {
-  //       try {
-  //         const base64Img = await getBase64Image(
-  //           student.image.path,
-  //           student.image.type
-  //         );
-  //         if (typeof base64Img === "string") {
-  //           console.log(base64Img);
-  //           doc.addImage(
-  //             base64Img,
-  //             student.image.type.split("/")[1].toUpperCase(),
-  //             10,
-  //             30 + imageHeight * index,
-  //             imageWidth,
-  //             imageHeight
-  //           );
-  //         }
-  //         index++;
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     }
-  //   }
-  //   if (index !== 0) {
-  //     doc.save("students.pdf");
-  //   } else {
-  //     toast("No data to export");
-  //   }
-  // };
+  const downloadPfdHandler = () => {
+    downloadingPdf.asyncWrapper(async () => {
+      const { data } = await apiClient.get("/api/student", {
+        params: {
+          take: 10000,
+        },
+      });
+      await studentPdf(data.data);
+    });
+  };
+
   return (
     <div className="flex justify-between items-center gap-3 pt-3 mb-3">
       <Input
@@ -119,8 +99,8 @@ export default function Header({
             </SelectGroup>
           </SelectContent>
         </Select>
+        <Button onClick={downloadPfdHandler}>Download pdf</Button>
         <BulkUpload triggerRefetchStudents={triggerRefetchStudents} />
-        {/* <Button onClick={downloadPfdHandler}>Download pdf</Button> */}
         <Dialog open={showAddBoardForm} onOpenChange={toggleAddBoardForm}>
           <Button
             onClick={() => {

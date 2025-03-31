@@ -26,8 +26,8 @@ studentRoutes.get(
   checkAdmin,
   checkReturnPayload(
     z.object({
-      skip: z.string().max(4).optional(),
-      take: z.string().max(4).optional(),
+      skip: z.string().max(5).optional(),
+      take: z.string().max(5).optional(),
       examId: z.string().optional(),
       q: z.string().max(100).optional(),
     }),
