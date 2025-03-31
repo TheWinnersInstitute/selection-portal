@@ -23,6 +23,7 @@ export default function AdminStudentsPage() {
   const searchParams = useSearchParams();
 
   const searchTimeout = useRef<NodeJS.Timeout>(null);
+
   const [showAddBoardForm, setShowAddBoardForm] = useState(false);
   const [editData, setEditData] = useState<null | Student>(null);
   const [selectedExamId, setSelectedExamId] = useState<string | null>(
@@ -50,6 +51,13 @@ export default function AdminStudentsPage() {
       state: "Madhya Pradesh",
     },
   });
+
+  // useEffect(() => {
+  //   const examId = searchParams.get("examId");
+  //   if (examId) {
+  //     setSelectedExamId(examId);
+  //   }
+  // }, []);
 
   const fetchStudents = async (
     skip: number,

@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
-import axios, { Axios, AxiosError } from "axios";
-import React, { useEffect, useMemo, useState } from "react";
+import { AxiosError } from "axios";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -15,7 +15,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 import { z } from "zod";
@@ -25,22 +24,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { CalendarIcon, Pen, Pencil, Trash2 } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -53,7 +42,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { useSearchParams } from "next/navigation";
@@ -78,7 +66,7 @@ const formSchema = z.object({
   boardId: z.string().uuid(),
 });
 
-export default function AdminExamsPage() {
+function AdminExamsPage() {
   const { apiClient } = useAuth();
   const [showAddBoardForm, setShowAddBoardForm] = useState(false);
   const { boards, setExams, exams } = useData();
@@ -185,8 +173,8 @@ export default function AdminExamsPage() {
             <DialogHeader>
               <DialogTitle>Create exam form</DialogTitle>
               {/* <DialogDescription>
-                
-              </DialogDescription> */}
+               
+             </DialogDescription> */}
             </DialogHeader>
             <Form {...form}>
               <form
@@ -354,5 +342,16 @@ export default function AdminExamsPage() {
         })}
       </div>
     </div>
+  );
+}
+export default function () {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center my-5">Loading...</div>
+      }
+    >
+      <AdminExamsPage />
+    </Suspense>
   );
 }
