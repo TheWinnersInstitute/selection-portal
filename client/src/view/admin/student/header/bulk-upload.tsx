@@ -10,6 +10,7 @@ type Props = {
 };
 
 export default function BulkUpload({ triggerRefetchStudents }: Props) {
+  const firstRender = useRef(true);
   const bulkUploadInputRef = useRef<HTMLInputElement>(null);
   // const [total, setTotal] = useState(0);
   const [underProcess, setUnderProcess] = useState(0);
@@ -27,7 +28,10 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
         const { data } = await apiClient.get("/api/student/bulk/status");
         setUnderProcess(data.data[0]);
         if (data.data[0] === 0) {
-          triggerRefetchStudents();
+          if (!firstRender) {
+            triggerRefetchStudents();
+          }
+          firstRender.current = false;
           setPooling(false);
         }
       }, 2000);
