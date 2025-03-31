@@ -15,15 +15,19 @@ import StudentTable from "./student-table";
 
 import Header from "./header";
 import { useLoading } from "@/hooks/use-loading";
+import { useSearchParams } from "next/navigation";
 
 // export const STUDENTS_PER_PAGE = 5;
 
 export default function AdminStudentsPage() {
+  const searchParams = useSearchParams();
+
   const searchTimeout = useRef<NodeJS.Timeout>(null);
-  const first = useRef(true);
   const [showAddBoardForm, setShowAddBoardForm] = useState(false);
   const [editData, setEditData] = useState<null | Student>(null);
-  const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
+  const [selectedExamId, setSelectedExamId] = useState<string | null>(
+    searchParams.get("examId")
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(-1);
   const [studentsPerPage, setStudentsPerPage] = useState(25);
@@ -78,10 +82,7 @@ export default function AdminStudentsPage() {
   };
 
   useEffect(() => {
-    if (!first.current) {
-      triggerRefetchStudents();
-      first.current = false;
-    }
+    triggerRefetchStudents();
   }, [selectedExamId, search]);
 
   useEffect(() => {

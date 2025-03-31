@@ -56,6 +56,8 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const formSchema = z.object({
   name: z
@@ -82,6 +84,8 @@ export default function AdminExamsPage() {
   const { boards, setExams, exams } = useData();
   const [editData, setEditData] = useState<null | Board>(null);
 
+  const searchParams = useSearchParams();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -95,7 +99,12 @@ export default function AdminExamsPage() {
     if ([].length === 0) {
       (async () => {
         try {
-          const { data } = await apiClient.get("/api/exam");
+          const board = searchParams.get("board");
+          const { data } = await apiClient.get("/api/exam", {
+            params: {
+              ...(board ? { boardId: board } : {}),
+            },
+          });
           setExams(data.data);
         } catch (error) {
           if (error instanceof AxiosError)
@@ -298,16 +307,19 @@ export default function AdminExamsPage() {
       {exams.length === 0 && (
         <p className="flex justify-center my-1">No data</p>
       )}
-      <div className="flex justify-between flex-wrap gap-5  mt-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5">
         {exams.map((exam) => {
           return (
             <div
-              className="bg-secondary px-5 py-3 rounded-sm flex-1 flex flex-col max-w-1/3"
+              className="bg-secondary px-5 py-3 rounded-sm flex-1 flex flex-col"
               key={exam.id}
             >
-              <h2 className="text-xl font-bold">
+              <Link
+                href={`/admin/student?examId=${exam.id}`}
+                className="text-xl font-bold"
+              >
                 {exam.name} ({exam.enrollmentCount})
-              </h2>
+              </Link>
               <p className="text-sm">{boardsMap[exam.boardId]?.name}</p>
               <p className="text-xs opacity-60">{exam.description}</p>
               <div className="flex-1"></div>

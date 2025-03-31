@@ -41,6 +41,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const formSchema = z.object({
   name: z
@@ -189,17 +191,19 @@ export default function AdminBoardPage() {
       {boards.length === 0 && (
         <p className="flex justify-center my-1">No data</p>
       )}
-      <div className="flex justify-between flex-wrap gap-5  mt-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5">
         {boards.map((board) => {
           return (
             <div
-              className="bg-secondary px-5 py-3 rounded-sm flex-1 flex flex-col max-w-1/3"
+              className="bg-secondary px-5 py-3 rounded-sm flex flex-col"
               key={board.id}
             >
-              <h2 className="text-xl font-bold">
+              <Link
+                href={`/admin/exam?board=${board.id}`}
+                className="text-xl font-bold"
+              >
                 {board.name} ({board.enrollmentCount})
-              </h2>
-              {/* <p className="text-sm">{boardsMap[exam.boardId]?.name}</p> */}
+              </Link>
               <p className="text-xs opacity-60">{board.description}</p>
               <div className="flex-1"></div>
               <div className="flex  justify-between items-center mt-3 gap-2">
