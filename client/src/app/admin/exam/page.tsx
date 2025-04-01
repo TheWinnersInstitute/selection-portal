@@ -29,7 +29,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, EllipsisVertical, Pen, Trash2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -46,6 +46,16 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 
 const formSchema = z.object({
   name: z
@@ -302,41 +312,52 @@ function AdminExamsPage() {
               className="bg-secondary px-5 py-3 rounded-sm flex-1 flex flex-col"
               key={exam.id}
             >
-              <Link
-                href={`/admin/student?examId=${exam.id}`}
-                className="text-xl font-bold"
-              >
-                {exam.name} ({exam.enrollmentCount})
-              </Link>
+              <div className="flex justify-between items-center">
+                <Link
+                  href={`/admin/student?examId=${exam.id}`}
+                  className="text-xl font-bold"
+                >
+                  {exam.name} ({exam.enrollmentCount})
+                </Link>
+                <Menubar className="bg-transparent border-0 p-0">
+                  <MenubarMenu>
+                    <MenubarTrigger className="p-0">
+                      <EllipsisVertical />
+                    </MenubarTrigger>
+                    <MenubarContent>
+                      <MenubarItem
+                        onClick={() => {
+                          setEditData(exam);
+                          form.setValue("name", exam.name);
+                          form.setValue("description", exam.description);
+                          form.setValue("boardId", exam.boardId);
+                          form.setValue("examDate", new Date(exam.examDate));
+                          toggleAddBoardForm();
+                        }}
+                      >
+                        Edit{" "}
+                        <MenubarShortcut>
+                          <Pen />
+                        </MenubarShortcut>
+                      </MenubarItem>
+                      <MenubarSeparator />
+                      <MenubarItem
+                        onClick={() => {
+                          deleteHandler(exam.id);
+                        }}
+                      >
+                        Delete
+                        <MenubarShortcut>
+                          <Trash2 />
+                        </MenubarShortcut>
+                      </MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
+              </div>
               <p className="text-sm">{boardsMap[exam.boardId]?.name}</p>
               <p className="text-xs opacity-60">{exam.description}</p>
               <div className="flex-1"></div>
-              <div className="flex justify-between items-center mt-3 gap-2">
-                <Button
-                  onClick={() => {
-                    setEditData(exam);
-                    form.setValue("name", exam.name);
-                    form.setValue("description", exam.description);
-                    form.setValue("boardId", exam.boardId);
-                    form.setValue("examDate", new Date(exam.examDate));
-                    toggleAddBoardForm();
-                  }}
-                  variant="outline"
-                  className="flex-1"
-                  size="sm"
-                >
-                  Edit
-                </Button>
-                <Button
-                  onClick={() => {
-                    deleteHandler(exam.id);
-                  }}
-                  className="flex-1"
-                  size="sm"
-                >
-                  Delete
-                </Button>
-              </div>
             </div>
           );
         })}

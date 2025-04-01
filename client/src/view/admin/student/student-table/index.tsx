@@ -1,5 +1,5 @@
 import { useData } from "@/context/DataContext";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import {
   Table,
@@ -30,6 +30,7 @@ import {
 
 import StudentTableRow from "./table-row";
 import Enrollments from "./enrollments";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type Props = {
   editHandler: (data: Student) => void;
@@ -77,7 +78,7 @@ export default function StudentTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead> </TableHead>
+              <TableHead>{/* <Checkbox /> */}</TableHead>
               <TableHead>Profile</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Mobile Number</TableHead>
@@ -104,10 +105,8 @@ export default function StudentTable({
                   <StudentTableRow
                     setStudentsToDelete={setStudentsToDelete}
                     key={student.id}
-                    // currentStudent={currentStudent}
                     setCurrentStudent={setCurrentStudent}
                     editHandler={editHandler}
-                    // index={studentsPerPage * (currentPage - 1) + index}
                     student={student}
                     onClick={() => {
                       setCurrentStudent(student);
@@ -171,10 +170,7 @@ export default function StudentTable({
             onValueChange={(v) => setStudentsPerPage(parseInt(v, 10))}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue
-                placeholder="Students per page"
-                // defaultValue={studentsPerPage}
-              />
+              <SelectValue placeholder="Students per page" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>

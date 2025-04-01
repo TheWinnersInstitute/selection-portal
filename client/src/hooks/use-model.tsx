@@ -16,12 +16,15 @@ export function useModel(title: string) {
     (children: ReactNode) => {
       return (
         <Dialog open={open} onOpenChange={toggleModel}>
-          <DialogContent className="lg:max-w-[50vw]">
+          <DialogContent
+            onClick={(e) => e.stopPropagation()}
+            className="lg:max-w-[50vw]"
+          >
             <DialogHeader>
               <DialogTitle>{title}</DialogTitle>
             </DialogHeader>
+            {children}
           </DialogContent>
-          {children}
         </Dialog>
       );
     },

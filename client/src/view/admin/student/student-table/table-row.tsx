@@ -21,6 +21,7 @@ import EnrollmentsList from "./enrollments/enrollments-list";
 import { Download, Pen, Trash2 } from "lucide-react";
 import { studentPdf } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useModel } from "@/hooks/use-model";
 
 type Props = {
   student: Student;
@@ -44,10 +45,15 @@ export default function StudentTableRow({
   const deletingStudent = useLoading();
   const downloadingPdf = useLoading();
 
+  const deleteConfirmationModel = useModel(
+    "Are you sure you want to delete this student ??"
+  );
+
   const deleteHandler = async (id: string) => {
     await apiClient.delete(`/api/student/${id}`);
     toast("Student deleted successfully");
     setStudents((prev) => prev.filter((student) => student.id !== id));
+    deleteConfirmationModel.toggleModel();
   };
 
   const downloadStudentPdf = () => {
@@ -113,17 +119,32 @@ export default function StudentTableRow({
         </Button>
         <Button
           variant="outline"
-          onClick={() => {
-            deletingStudent.asyncWrapper(() => deleteHandler(student.id));
-          }}
+          onClick={deleteConfirmationModel.toggleModel}
           size="icon"
         >
-          {deletingStudent.loader || <Trash2 />}
+          <Trash2 />
         </Button>
         <Button variant="outline" onClick={downloadStudentPdf} size="icon">
           {downloadingPdf.loader || <Download />}
         </Button>
       </TableCell>
+      {deleteConfirmationModel.content(
+        <div className="flex justify-end items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={deleteConfirmationModel.toggleModel}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              deletingStudent.asyncWrapper(() => deleteHandler(student.id));
+            }}
+          >
+            {deletingStudent.loader || "Delete"}
+          </Button>
+        </div>
+      )}
     </TableRow>
   );
 }

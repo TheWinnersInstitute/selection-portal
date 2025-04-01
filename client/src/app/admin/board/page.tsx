@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
-import { Axios, AxiosError } from "axios";
-import React, { useEffect, useState } from "react";
+import { AxiosError } from "axios";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -15,34 +15,31 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Pencil, Trash2 } from "lucide-react";
+import { EllipsisVertical, MenuIcon, Pen, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 const formSchema = z.object({
   name: z
@@ -198,38 +195,48 @@ export default function AdminBoardPage() {
               className="bg-secondary px-5 py-3 rounded-sm flex flex-col"
               key={board.id}
             >
-              <Link
-                href={`/admin/exam?board=${board.id}`}
-                className="text-xl font-bold"
-              >
-                {board.name} ({board.enrollmentCount})
-              </Link>
-              <p className="text-xs opacity-60">{board.description}</p>
-              <div className="flex-1"></div>
-              <div className="flex  justify-between items-center mt-3 gap-2">
-                <Button
-                  onClick={() => {
-                    setEditData(board);
-                    form.setValue("name", board.name);
-                    form.setValue("description", board.description);
-                    toggleAddBoardForm();
-                  }}
-                  variant="outline"
-                  className="flex-1"
-                  size="sm"
+              <div className="flex justify-between items-center">
+                <Link
+                  href={`/admin/exam?board=${board.id}`}
+                  className="text-xl font-bold"
                 >
-                  Edit
-                </Button>
-                <Button
-                  onClick={() => {
-                    deleteHandler(board.id);
-                  }}
-                  className="flex-1"
-                  size="sm"
-                >
-                  Delete
-                </Button>
+                  {board.name} ({board.enrollmentCount})
+                </Link>
+                <Menubar className="bg-transparent border-0 p-0">
+                  <MenubarMenu>
+                    <MenubarTrigger className="p-0">
+                      <EllipsisVertical />
+                    </MenubarTrigger>
+                    <MenubarContent>
+                      <MenubarItem
+                        onClick={() => {
+                          setEditData(board);
+                          form.setValue("name", board.name);
+                          form.setValue("description", board.description);
+                          toggleAddBoardForm();
+                        }}
+                      >
+                        Edit{" "}
+                        <MenubarShortcut>
+                          <Pen />
+                        </MenubarShortcut>
+                      </MenubarItem>
+                      <MenubarSeparator />
+                      <MenubarItem
+                        onClick={() => {
+                          deleteHandler(board.id);
+                        }}
+                      >
+                        Delete
+                        <MenubarShortcut>
+                          <Trash2 />
+                        </MenubarShortcut>
+                      </MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
               </div>
+              <p className="text-xs opacity-60">{board.description}</p>
             </div>
           );
         })}

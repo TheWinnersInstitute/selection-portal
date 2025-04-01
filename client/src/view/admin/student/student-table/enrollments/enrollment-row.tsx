@@ -14,6 +14,7 @@ import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { Trash2 } from "lucide-react";
+import { useModel } from "@/hooks/use-model";
 
 type Props = {
   enrollment: Enrollment;
@@ -25,22 +26,20 @@ export default function EnrollmentRow({ enrollment, index, onDelete }: Props) {
   const { apiClient } = useAuth();
 
   const deleting = useLoading();
+  const deleteConfirmationModel = useModel(
+    "Are you sure you want to delete this enrollment ??"
+  );
 
   const deleteHandler = (id: string) => {
     deleting.asyncWrapper(async () => {
-      try {
-        await apiClient.delete(`/api/student/enrollment/${id}`);
-        onDelete();
-      } catch (error) {
-        if (error instanceof AxiosError)
-          toast(error.response?.data?.message || "Something went wrong");
-      }
+      await apiClient.delete(`/api/student/enrollment/${id}`);
+      onDelete();
+      deleteConfirmationModel.toggleModel();
     });
   };
 
   return (
     <TableRow>
-      {/* <TableCell>{index + 1}</TableCell> */}
       <TableCell
         className={`${enrollment?.resultId ? "text-blue-500" : ""}`}
         onClick={(e) => {
@@ -70,14 +69,30 @@ export default function EnrollmentRow({ enrollment, index, onDelete }: Props) {
       <TableCell>
         <Button
           variant="outline"
-          onClick={() => {
-            deleteHandler(enrollment.id);
-          }}
+          onClick={deleteConfirmationModel.toggleModel}
           size="icon"
         >
           {deleting.loader || <Trash2 />}
         </Button>
       </TableCell>
+
+      {deleteConfirmationModel.content(
+        <div className="flex justify-end items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={deleteConfirmationModel.toggleModel}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              deleteHandler(enrollment.id);
+            }}
+          >
+            {deleting.loader || "Delete"}
+          </Button>
+        </div>
+      )}
     </TableRow>
   );
 }
