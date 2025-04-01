@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
-console.log(`Port - ${process.env.PORT}`);
+
 import express from "express";
+import { CronJob } from "cron";
 import cors from "cors";
+
 import { authRoutes, boardRoutes, examRoutes, studentRoutes } from "./routes";
 import { RedisClient, S3, seed } from "./lib";
 import { adminRoutes } from "./routes/admin.routes";
@@ -28,6 +30,8 @@ async function main() {
   app.use("/api/board", boardRoutes);
   app.use("/api/exam", examRoutes);
   app.use("/api/student", studentRoutes);
+
+  S3.instance.backup();
 
   app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 }

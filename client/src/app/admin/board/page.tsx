@@ -241,53 +241,6 @@ export default function AdminBoardPage() {
           );
         })}
       </div>
-      {/*       
-      {boards.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>S.No.</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Total Selections</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {boards.map((board, index) => (
-              <TableRow key={board.id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{board.name}</TableCell>
-                <TableCell>{board.enrollmentCount}</TableCell>
-                <TableCell>{board.description.slice(0, 40)}</TableCell>
-                <TableCell className="space-x-2">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setEditData(board);
-                      form.setValue("name", board.name);
-                      form.setValue("description", board.description);
-                      toggleAddBoardForm();
-                    }}
-                    size="sm"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      deleteHandler(board.id);
-                    }}
-                    size="sm"
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )} */}
     </div>
   );
 }

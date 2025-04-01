@@ -13,7 +13,6 @@ export class RedisClient {
   public queueLength: number;
 
   private constructor() {
-    console.log(__dirname);
     this.redisClient = new IORedis({
       host: process.env.REDIS_HOST as string,
       password: process.env.REDIS_PASSWORD as string,

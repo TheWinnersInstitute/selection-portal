@@ -3,6 +3,10 @@ import { S3Client } from "@aws-sdk/client-s3";
 import multer from "multer";
 import multerS3 from "multer-s3";
 import { toSnakeCase } from "./google";
+import { CronJob } from "cron";
+import { prisma } from "./db";
+import fs from "fs";
+import path from "path";
 
 export class S3 {
   private static _instance: S3;
@@ -59,6 +63,44 @@ export class S3 {
         },
       }),
     });
+  }
+
+  backup() {
+    new CronJob("0 0 * * *", async () => {
+      console.log("Running cron job", new Date().toString());
+      try {
+        const boards = await prisma.board.findMany();
+        const exams = await prisma.exam.findMany();
+        const students = await prisma.student.findMany();
+        const assets = await prisma.asset.findMany();
+
+        const data = {
+          boards,
+          exams,
+          students,
+          assets,
+        };
+
+        const jsonData = JSON.stringify(data, null, 2);
+
+        const filePath = path.join(__dirname, "../../assets/backup.json");
+        fs.writeFileSync(filePath, jsonData, "utf8");
+
+        await this.s3
+          .upload({
+            Bucket: process.env.AWS_S3_BUCKET as string,
+            Key: "backup.json",
+            Body: fs.createReadStream(filePath),
+            ContentType: "application/json",
+          })
+          .promise();
+
+        fs.unlinkSync(filePath);
+      } catch (error) {
+        console.log(error);
+        console.log("CRON JOB FAILED");
+      }
+    }).start();
   }
 
   public static get instance() {
