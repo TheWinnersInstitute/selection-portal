@@ -33,6 +33,7 @@ export default function AdminStudentsPage() {
   const [total, setTotal] = useState(-1);
   const [studentsPerPage, setStudentsPerPage] = useState(25);
   const [search, setSearch] = useState("");
+  const [studentsToDelete, setStudentsToDelete] = useState<string[]>([]);
 
   const { apiClient, isAuthenticated } = useAuth();
   const { setStudents, students } = useData();
@@ -51,13 +52,6 @@ export default function AdminStudentsPage() {
       state: "Madhya Pradesh",
     },
   });
-
-  // useEffect(() => {
-  //   const examId = searchParams.get("examId");
-  //   if (examId) {
-  //     setSelectedExamId(examId);
-  //   }
-  // }, []);
 
   const fetchStudents = async (
     skip: number,
@@ -117,6 +111,7 @@ export default function AdminStudentsPage() {
   return (
     <div>
       <Header
+        studentsToDelete={studentsToDelete}
         triggerRefetchStudents={triggerRefetchStudents}
         form={form}
         setEditData={setEditData}
@@ -127,6 +122,7 @@ export default function AdminStudentsPage() {
         searchHandler={searchHandler}
       />
       <StudentTable
+        setStudentsToDelete={setStudentsToDelete}
         editHandler={(student) => {
           setEditData(student);
           form.setValue("name", student.name);

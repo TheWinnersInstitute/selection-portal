@@ -9,15 +9,26 @@ export async function deleteStudent(
   try {
     const { id } = req.params;
 
-    await prisma.enrollment.deleteMany({
-      where: {
-        studentId: id,
+    const student = await prisma.student.findUnique({
+      where: { id },
+      include: {
+        Enrollment: true,
+        image: true,
       },
     });
-    await prisma.student.delete({
-      where: { id },
-      include: studentInclude,
-    });
+
+    if (!student) {
+      res.status(404).json({ message: "Student not found" });
+      return;
+    }
+
+    await prisma.enrollment.deleteMany({ where: { studentId: id } });
+
+    if (student.imageId) {
+      await prisma.asset.delete({ where: { id: student.imageId } });
+    }
+
+    await prisma.student.delete({ where: { id } });
     res.status(200).json({
       message: "success",
       data: [],

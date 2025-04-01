@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 
 import {
   Table,
@@ -20,22 +20,21 @@ import { format } from "date-fns";
 import EnrollmentsList from "./enrollments/enrollments-list";
 import { Download, Pen, Trash2 } from "lucide-react";
 import { studentPdf } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type Props = {
   student: Student;
-  index: number;
   editHandler: (data: Student) => void;
   onClick?: () => void;
-  currentStudent: Student | null;
   setCurrentStudent: (data: Student | null) => void;
+  setStudentsToDelete: React.Dispatch<React.SetStateAction<string[]>>;
 };
 export default function StudentTableRow({
   student,
-  index,
   editHandler,
   onClick,
-  currentStudent,
   setCurrentStudent,
+  setStudentsToDelete,
 }: Props) {
   const nameArray = student.name.split(" ");
 
@@ -46,15 +45,9 @@ export default function StudentTableRow({
   const downloadingPdf = useLoading();
 
   const deleteHandler = async (id: string) => {
-    try {
-      await apiClient.delete(`/api/student/${id}`);
-      toast("Student deleted successfully");
-      setStudents((prev) => prev.filter((student) => student.id !== id));
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast(error.response?.data?.message || "Something went wrong");
-      }
-    }
+    await apiClient.delete(`/api/student/${id}`);
+    toast("Student deleted successfully");
+    setStudents((prev) => prev.filter((student) => student.id !== id));
   };
 
   const downloadStudentPdf = () => {
@@ -65,7 +58,18 @@ export default function StudentTableRow({
 
   return (
     <TableRow onClick={onClick}>
-      <TableCell>{index + 1}</TableCell>
+      <TableCell onClick={(e) => e.stopPropagation()}>
+        <Checkbox
+          onCheckedChange={(e) => {
+            setStudentsToDelete((prev) => {
+              if (e) {
+                return [...prev, student.id];
+              }
+              return prev.filter((id) => id !== student.id);
+            });
+          }}
+        />
+      </TableCell>
       <TableCell
         onClick={(e) => {
           e.stopPropagation();

@@ -191,7 +191,7 @@ export default function AdminBoardPage() {
       {boards.length === 0 && (
         <p className="flex justify-center my-1">No data</p>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-5">
         {boards.map((board) => {
           return (
             <div

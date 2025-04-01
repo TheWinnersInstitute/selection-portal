@@ -28,8 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useLoading } from "@/hooks/use-loading";
-import { useAuth } from "@/context/AuthContext";
 
 type Props = {
   showAddBoardForm: boolean;
@@ -40,6 +38,7 @@ type Props = {
   setSelectedExamId: React.Dispatch<React.SetStateAction<string | null>>;
   triggerRefetchStudents: () => void;
   searchHandler: (q: string) => void;
+  studentsToDelete: string[];
 };
 
 export default function Header({
@@ -51,22 +50,9 @@ export default function Header({
   setSelectedExamId,
   triggerRefetchStudents,
   searchHandler,
+  studentsToDelete,
 }: Props) {
   const { exams } = useData();
-  const { apiClient } = useAuth();
-
-  const downloadingPdf = useLoading();
-
-  const downloadPfdHandler = () => {
-    downloadingPdf.asyncWrapper(async () => {
-      const { data } = await apiClient.get("/api/student", {
-        params: {
-          take: 10000,
-        },
-      });
-      await studentPdf(data.data);
-    });
-  };
 
   return (
     <div className="flex justify-between items-center gap-3 pt-3 mb-3">
@@ -99,8 +85,10 @@ export default function Header({
             </SelectGroup>
           </SelectContent>
         </Select>
-        <Button onClick={downloadPfdHandler}>Download pdf</Button>
-        <BulkUpload triggerRefetchStudents={triggerRefetchStudents} />
+        <BulkUpload
+          studentsToDelete={studentsToDelete}
+          triggerRefetchStudents={triggerRefetchStudents}
+        />
         <Dialog open={showAddBoardForm} onOpenChange={toggleAddBoardForm}>
           <Button
             onClick={() => {

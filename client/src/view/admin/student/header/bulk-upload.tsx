@@ -1,26 +1,35 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { useData } from "@/context/DataContext";
 import { useLoading } from "@/hooks/use-loading";
+import { studentPdf } from "@/lib/utils";
 import { AxiosError } from "axios";
+import { Delete, Download, Trash2, Upload } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
   triggerRefetchStudents: () => void;
+  studentsToDelete: string[];
 };
 
-export default function BulkUpload({ triggerRefetchStudents }: Props) {
+export default function BulkUpload({
+  triggerRefetchStudents,
+  studentsToDelete,
+}: Props) {
   const firstRender = useRef(true);
   const bulkUploadInputRef = useRef<HTMLInputElement>(null);
   // const [total, setTotal] = useState(0);
   const [underProcess, setUnderProcess] = useState(0);
   const [pooling, setPooling] = useState(true);
   const { apiClient, isAuthenticated } = useAuth();
+  const { setStudents } = useData();
 
   const downloadingStudentData = useLoading();
   const uploadingFile = useLoading();
-
+  const downloadingPdf = useLoading();
   const downloadingErroredData = useLoading();
+  const deleting = useLoading();
 
   useEffect(() => {
     if (pooling && isAuthenticated) {
@@ -43,6 +52,23 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
     return () => {};
   }, [pooling, isAuthenticated]);
 
+  const bulkDeleteHandler = () => {
+    deleting.asyncWrapper(async () => {
+      if (studentsToDelete.length === 0) {
+        toast("Please select students to delete");
+        return;
+      }
+      await Promise.all(
+        studentsToDelete.map((id) => {
+          return (async () => {
+            await apiClient.delete(`/api/student/${id}`);
+            setStudents((prev) => prev.filter((student) => student.id !== id));
+          })();
+        })
+      );
+    });
+  };
+
   const bulkUploadHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
     uploadingFile.asyncWrapper(async () => {
       try {
@@ -63,6 +89,17 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
           toast(error.response?.data?.message || "Something went wrong");
         }
       }
+    });
+  };
+
+  const downloadPfdHandler = () => {
+    downloadingPdf.asyncWrapper(async () => {
+      const { data } = await apiClient.get("/api/student", {
+        params: {
+          take: 10000,
+        },
+      });
+      await studentPdf(data.data);
     });
   };
 
@@ -121,14 +158,19 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
       }
     });
   };
-
   return (
     <>
+      <Button onClick={bulkDeleteHandler}>
+        <Trash2 /> {deleting.loader || " Students"}
+      </Button>
+      <Button onClick={downloadPfdHandler}>
+        <Download /> {" PDF"}
+      </Button>
       <Button onClick={downloadStudentsDataHandler}>
-        {downloadingStudentData.loader || "Download excel"}
+        <Download /> {downloadingStudentData.loader || " Excel"}
       </Button>
       <Button onClick={downloadErroredDataHandler}>
-        {downloadingErroredData.loader || "Download errored data"}
+        <Download /> {downloadingErroredData.loader || " Errored data"}
       </Button>
       <input
         multiple={false}
@@ -142,8 +184,8 @@ export default function BulkUpload({ triggerRefetchStudents }: Props) {
         disabled={pooling || uploadingFile.loading}
         onClick={() => bulkUploadInputRef.current?.click()}
       >
-        {uploadingFile.loader ||
-          (pooling ? `Processing ${underProcess}` : "Bulk upload")}
+        <Upload />
+        {uploadingFile.loader || (pooling ? ` ${underProcess}` : " Bulk")}
       </Button>
     </>
   );

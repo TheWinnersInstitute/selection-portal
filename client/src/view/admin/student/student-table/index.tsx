@@ -1,5 +1,5 @@
 import { useData } from "@/context/DataContext";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 import {
   Table,
@@ -39,6 +39,7 @@ type Props = {
   studentsPerPage: number;
   setStudentsPerPage: React.Dispatch<React.SetStateAction<number>>;
   loader: React.JSX.Element | null;
+  setStudentsToDelete: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 export default function StudentTable({
@@ -49,6 +50,7 @@ export default function StudentTable({
   setStudentsPerPage,
   studentsPerPage,
   loader,
+  setStudentsToDelete,
 }: Props) {
   const [showViewStudentModel, setShowViewStudentModel] = useState(false);
   const [currentStudent, setCurrentStudent] = useState<null | Student>(null);
@@ -75,7 +77,7 @@ export default function StudentTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>S.No.</TableHead>
+              <TableHead> </TableHead>
               <TableHead>Profile</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Mobile Number</TableHead>
@@ -100,11 +102,12 @@ export default function StudentTable({
               .map((student, index) => {
                 return (
                   <StudentTableRow
+                    setStudentsToDelete={setStudentsToDelete}
                     key={student.id}
-                    currentStudent={currentStudent}
+                    // currentStudent={currentStudent}
                     setCurrentStudent={setCurrentStudent}
                     editHandler={editHandler}
-                    index={studentsPerPage * (currentPage - 1) + index}
+                    // index={studentsPerPage * (currentPage - 1) + index}
                     student={student}
                     onClick={() => {
                       setCurrentStudent(student);
