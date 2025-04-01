@@ -309,13 +309,13 @@ function AdminExamsPage() {
         {exams.map((exam) => {
           return (
             <div
-              className="bg-secondary px-5 py-3 rounded-sm flex-1 flex flex-col"
+              className="bg-secondary px-5 py-3 min-h-28 rounded-sm flex-1 flex flex-col"
               key={exam.id}
             >
               <div className="flex justify-between items-center">
                 <Link
                   href={`/admin/student?examId=${exam.id}`}
-                  className="text-xl font-bold"
+                  className="text-md font-bold"
                 >
                   {exam.name} ({exam.enrollmentCount})
                 </Link>
