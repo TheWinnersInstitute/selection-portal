@@ -73,12 +73,20 @@ export class S3 {
         const exams = await prisma.exam.findMany();
         const students = await prisma.student.findMany();
         const assets = await prisma.asset.findMany();
+        const enrollments = await prisma.enrollment.findMany();
 
         const data = {
           boards,
           exams,
-          students,
+          students: students.map((student) => ({
+            ...student,
+            contactNumber: student.contactNumber.toString(),
+          })),
           assets,
+          enrollments: enrollments.map((enrollment) => ({
+            ...enrollment,
+            rollNumber: enrollment.rollNumber.toString(),
+          })),
         };
 
         const jsonData = JSON.stringify(data, null, 2);
