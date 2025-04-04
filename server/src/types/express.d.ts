@@ -2,7 +2,14 @@ declare namespace Express {
   interface Request {
     session: {
       id: string;
-      role: "admin" | "user";
+      role: {
+        id: string;
+        name: string;
+        exam: Action[];
+        enrollment: Action[];
+        board: Action[];
+        student: Action[];
+      };
       createdAt: Date;
       updatedAt: Date;
       userId: string;
@@ -10,3 +17,6 @@ declare namespace Express {
     };
   }
 }
+
+type Model = "exam" | "enrollment" | "board" | "student" | "user" | "role";
+type Action = "read" | "create" | "update" | "delete";

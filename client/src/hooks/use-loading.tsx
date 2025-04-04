@@ -1,11 +1,23 @@
+import { AxiosError } from "axios";
 import React, { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export function useLoading(initialState = false) {
   const [loading, setLoading] = useState(initialState);
+  const [unauthorized, setUnauthorized] = useState(false);
 
   const asyncWrapper = async (cb: () => Promise<any>) => {
     setLoading(true);
-    await cb();
+    try {
+      await cb();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          setUnauthorized(true);
+        }
+        toast(error.response?.data?.message || "Something went wrong");
+      }
+    }
     setLoading(false);
   };
 
@@ -41,5 +53,5 @@ export function useLoading(initialState = false) {
     return null;
   }, [loading]);
 
-  return { asyncWrapper, loading, loader };
+  return { asyncWrapper, loading, loader, unauthorized };
 }

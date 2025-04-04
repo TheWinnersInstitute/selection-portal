@@ -5,9 +5,7 @@ import {
   getExams,
   updateExam,
 } from "../controllers/exam";
-import { checkAuth } from "../middleware/checkAuth";
-import { checkAdmin } from "../middleware/checkAdmin";
-import { checkReturnPayload } from "../middleware/checkRequestPayload";
+import { checkReturnPayload, checkAccess, checkAuth } from "../middleware";
 import { z } from "zod";
 
 export const examRoutes = Router();
@@ -16,7 +14,7 @@ examRoutes.get("/", getExams);
 examRoutes.post(
   "/",
   checkAuth,
-  checkAdmin,
+  checkAccess("exam", "create"),
   checkReturnPayload(
     z.object({
       name: z.string().max(100).min(1),
@@ -30,7 +28,7 @@ examRoutes.post(
 examRoutes.delete(
   "/:id",
   checkAuth,
-  checkAdmin,
+  checkAccess("exam", "delete"),
   checkReturnPayload(
     z.object({
       id: z.string().uuid(),
@@ -43,7 +41,7 @@ examRoutes.delete(
 examRoutes.patch(
   "/",
   checkAuth,
-  checkAdmin,
+  checkAccess("exam", "update"),
   checkReturnPayload(
     z.object({
       id: z.string().uuid(),

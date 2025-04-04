@@ -46,3 +46,22 @@ type Enrollment = {
   examId: string;
   exam: Exam;
 };
+
+type Role = {
+  id: string;
+  name: string;
+  exam: Action[];
+  enrollment: Action[];
+  board: Action[];
+  student: Action[];
+  user: Action[];
+  role: Action[];
+};
+
+type Action = "read" | "create" | "update" | "delete";
+
+type User = {
+  id: string;
+  email: string;
+  role: Role | null;
+};

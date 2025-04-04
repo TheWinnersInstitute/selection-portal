@@ -108,6 +108,16 @@ export default function AdminStudentsPage() {
 
   const toggleAddBoardForm = () => setShowAddBoardForm((prev) => !prev);
 
+  if (fetchingStudents.unauthorized) {
+    return (
+      <div className="flex flex-col items-center justify-center mt-10">
+        <h2 className="font-bold opacity-55">
+          You are not authorized to access this screen
+        </h2>
+      </div>
+    );
+  }
+
   return (
     <div>
       <Header

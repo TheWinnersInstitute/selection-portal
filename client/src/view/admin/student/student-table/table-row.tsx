@@ -49,11 +49,13 @@ export default function StudentTableRow({
     "Are you sure you want to delete this student ??"
   );
 
-  const deleteHandler = async (id: string) => {
-    await apiClient.delete(`/api/student/${id}`);
-    toast("Student deleted successfully");
-    setStudents((prev) => prev.filter((student) => student.id !== id));
-    deleteConfirmationModel.toggleModel();
+  const deleteHandler = (id: string) => {
+    deletingStudent.asyncWrapper(async () => {
+      await apiClient.delete(`/api/student/${id}`);
+      toast("Student deleted successfully");
+      setStudents((prev) => prev.filter((student) => student.id !== id));
+      deleteConfirmationModel.toggleModel();
+    });
   };
 
   const downloadStudentPdf = () => {
@@ -138,7 +140,8 @@ export default function StudentTableRow({
           </Button>
           <Button
             onClick={() => {
-              deletingStudent.asyncWrapper(() => deleteHandler(student.id));
+              deleteHandler(student.id);
+              // (() => );
             }}
           >
             {deletingStudent.loader || "Delete"}

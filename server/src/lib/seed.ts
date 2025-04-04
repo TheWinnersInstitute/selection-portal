@@ -3,11 +3,41 @@ import crypto from "crypto";
 
 export async function seed() {
   const adminEmail = "admin@gmail.com";
+
+  let role = await prisma.role.findUnique({
+    where: {
+      name: "Admin",
+    },
+  });
+
   const adminExist = await prisma.user.findUnique({
     where: {
       email: adminEmail,
     },
   });
+
+  if (!role) {
+    role = await prisma.role.create({
+      data: {
+        name: "Admin",
+        board: ["create", "delete", "read", "update"],
+        enrollment: ["create", "delete", "read", "update"],
+        exam: ["create", "delete", "read", "update"],
+        role: ["create", "delete", "read", "update"],
+        user: ["create", "delete", "read", "update"],
+        student: ["create", "delete", "read", "update"],
+      },
+    });
+    if (adminExist) {
+      await prisma.user.update({
+        where: { id: adminExist.id },
+        data: {
+          roleId: role.id,
+        },
+      });
+    }
+    console.log("Admin role created");
+  }
 
   const passwordHash = crypto
     .createHash("sha256")
@@ -19,7 +49,7 @@ export async function seed() {
       data: {
         email: adminEmail,
         password: passwordHash,
-        role: "admin",
+        roleId: role.id,
       },
     });
     console.log("Admin user created successfully");

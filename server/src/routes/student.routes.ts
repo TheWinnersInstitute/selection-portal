@@ -8,9 +8,7 @@ import {
   downloadErroredData,
   queueStatus,
 } from "../controllers/student";
-import { checkAuth } from "../middleware/checkAuth";
-import { checkAdmin } from "../middleware/checkAdmin";
-import { checkReturnPayload } from "../middleware/checkRequestPayload";
+import { checkReturnPayload, checkAccess, checkAuth } from "../middleware";
 import { z } from "zod";
 import { S3, studentBulkUpload } from "../lib/s3";
 import { downloadStudentsExcel } from "../controllers/student/download";
@@ -23,7 +21,7 @@ export const studentRoutes = Router();
 studentRoutes.get(
   "/",
   checkAuth,
-  checkAdmin,
+  checkAccess("student", "read"),
   checkReturnPayload(
     z.object({
       skip: z.string().max(5).optional(),
@@ -39,7 +37,7 @@ studentRoutes.get(
 studentRoutes.post(
   "/",
   checkAuth,
-  checkAdmin,
+  checkAccess("student", "create"),
   S3.instance.uploadFile.single("file"),
   checkReturnPayload(
     z.object({
@@ -59,7 +57,7 @@ studentRoutes.post(
 studentRoutes.delete(
   "/:id",
   checkAuth,
-  checkAdmin,
+  checkAccess("student", "delete"),
   checkReturnPayload(
     z.object({
       id: z.string().uuid(),
@@ -72,7 +70,7 @@ studentRoutes.delete(
 studentRoutes.patch(
   "/",
   checkAuth,
-  checkAdmin,
+  checkAccess("student", "update"),
   S3.instance.uploadFile.single("file"),
   checkReturnPayload(
     z.object({
@@ -93,19 +91,34 @@ studentRoutes.patch(
 studentRoutes.post(
   "/bulk",
   checkAuth,
-  checkAdmin,
+  checkAccess("student", "create"),
   studentBulkUpload.single("file"),
   createStudents
 );
 
-studentRoutes.get("/bulk-error", checkAuth, checkAdmin, downloadErroredData);
-studentRoutes.get("/bulk", checkAuth, checkAdmin, downloadStudentsExcel);
-studentRoutes.get("/bulk/status", checkAuth, checkAdmin, queueStatus);
+studentRoutes.get(
+  "/bulk-error",
+  checkAuth,
+  checkAccess("student", "read"),
+  downloadErroredData
+);
+studentRoutes.get(
+  "/bulk",
+  checkAuth,
+  checkAccess("student", "read"),
+  downloadStudentsExcel
+);
+studentRoutes.get(
+  "/bulk/status",
+  checkAuth,
+  checkAccess("student", "read"),
+  queueStatus
+);
 
 studentRoutes.post(
   "/enrollment",
   checkAuth,
-  checkAdmin,
+  checkAccess("enrollment", "create"),
   S3.instance.uploadResult.single("file"),
   checkReturnPayload(
     z.object({
@@ -124,7 +137,7 @@ studentRoutes.post(
 studentRoutes.delete(
   "/enrollment/:id",
   checkAuth,
-  checkAdmin,
+  checkAccess("enrollment", "delete"),
   checkReturnPayload(
     z.object({
       id: z.string().uuid(),

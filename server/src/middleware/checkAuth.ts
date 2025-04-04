@@ -14,6 +14,9 @@ export async function checkAuth(
         where: {
           hash: sessionHash,
         },
+        include: {
+          role: true,
+        },
       });
 
       if (session) {

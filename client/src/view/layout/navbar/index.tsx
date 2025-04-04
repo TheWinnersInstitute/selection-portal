@@ -20,7 +20,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import { Book, BookUser, User } from "lucide-react";
+import {
+  Book,
+  BookUser,
+  GraduationCap,
+  MonitorCogIcon,
+  User,
+  Users,
+} from "lucide-react";
 
 const items = [
   {
@@ -36,7 +43,17 @@ const items = [
   {
     title: "Students",
     url: "/admin/student",
-    icon: User,
+    icon: GraduationCap,
+  },
+  {
+    title: "Roles",
+    url: "/admin/role",
+    icon: MonitorCogIcon,
+  },
+  {
+    title: "Users",
+    url: "/admin/user",
+    icon: Users,
   },
 ];
 

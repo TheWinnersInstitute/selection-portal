@@ -10,11 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -30,9 +25,6 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { StateAndCities } from "@/lib/data";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
 import { useLoading } from "@/hooks/use-loading";
 
 export const studentFormSchema = z.object({

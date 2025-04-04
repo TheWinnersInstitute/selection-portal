@@ -54,6 +54,7 @@ export class RedisClient {
             result,
             rollNumber,
             email,
+            rank,
           } = shapedObject;
 
           let student = await prisma.student.findUnique({
@@ -102,6 +103,7 @@ export class RedisClient {
                   post,
                   resultId: resultId,
                   studentId: student.id,
+                  rank: String(rank || "") || null,
                 },
               });
               if (enrollment && !enrollment.resultId && result)

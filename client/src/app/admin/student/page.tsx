@@ -10,7 +10,7 @@ export default function ServerAdminStudentsPage() {
         <div className="flex justify-center items-center my-5">Loading...</div>
       }
     >
-      <AdminStudentsPage />;
+      <AdminStudentsPage />
     </Suspense>
   );
 }

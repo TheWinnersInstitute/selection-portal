@@ -35,8 +35,8 @@ export async function adminLogin(req: Request, res: Response): Promise<void> {
     await prisma.session.create({
       data: {
         hash: sessionHash,
-        role: user.role,
         userId: user.id,
+        roleId: user.roleId,
       },
     });
     res.status(200).json({
@@ -45,7 +45,7 @@ export async function adminLogin(req: Request, res: Response): Promise<void> {
         {
           sessionHash,
           email: user.email,
-          role: user.role,
+          roleId: user.roleId,
         },
       ],
     });

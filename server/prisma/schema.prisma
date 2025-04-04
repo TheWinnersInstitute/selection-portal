@@ -10,20 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  admin
-}
-
 model User {
   id        String    @id @default(uuid())
   email     String    @unique
   password  String
-  role      Role
+  role      Role?     @relation(fields: [roleId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   boards    Board[]
   exams     Exam[]
   Session   Session[]
+  roleId    String?
 
   @@map("users")
 }
@@ -32,10 +29,11 @@ model Session {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  role      Role
+  role      Role?    @relation(fields: [roleId], references: [id])
   hash      String   @unique
   user      User     @relation(fields: [userId], references: [id])
   userId    String
+  roleId    String?
 
   @@map("sessions")
 }
@@ -123,6 +121,28 @@ model Asset {
   studentResult Enrollment[] @relation("student_result")
 
   @@map("assets")
+}
+
+model Role {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  User       User[]
+  Session    Session[]
+  exam       Action[]
+  enrollment Action[]
+  board      Action[]
+  student    Action[]
+  user       Action[]
+  role       Action[]
+
+  @@map("roles")
+}
+
+enum Action {
+  read
+  create
+  update
+  delete
 }
 
 enum ExamStatus {
