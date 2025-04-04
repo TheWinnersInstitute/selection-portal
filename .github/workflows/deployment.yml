@@ -13,19 +13,26 @@ jobs:
       - name: Check required secrets
         run: |
           missing=false
-          for secret in SSH_HOST SSH_USER SSH_PRIVATE_KEY; do
+          for secret in SSH_PRIVATE_KEY; do
             if [ -z "${!secret}" ]; then
-              echo "Error: Secret $secret is missing!"
-              exit 0
+              echo "Warning: Secret $secret is missing!"
+              missing=true
             fi
           done
 
+          if [ "$missing" = true ]; then
+            echo "skip=true" >> $GITHUB_ENV
+            export skip=true
+          fi
+
       - name: Add to known hosts
+        if: env.skip != 'true'
         run: |
           mkdir -p ~/.ssh/known_hosts
           cp known_hosts ~/.ssh/known_hosts
 
       - name: SSH
+        if: env.skip != 'true'
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
