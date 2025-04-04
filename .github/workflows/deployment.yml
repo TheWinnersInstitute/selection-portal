@@ -1,0 +1,51 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check required secrets
+        run: |
+          missing=false
+          for secret in SSH_HOST SSH_USER SSH_PRIVATE_KEY; do
+            if [ -z "${!secret}" ]; then
+              echo "Error: Secret $secret is missing!"
+              exit 0
+            fi
+          done
+
+      - name: Add to known hosts
+        run: |
+          mkdir -p ~/.ssh/known_hosts
+          cp known_hosts ~/.ssh/known_hosts
+
+      - name: SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd selection-portal
+            git stash
+            git pull origin main
+
+            source ~/.profile
+            source ~/.nvm/nvm.sh
+            nvm use v20.9.0
+
+            cd server
+            npm install
+            npx tsc -b
+            pm2 restart winnners-selection-portal-backend
+            cd ../client
+            npm install
+            npm run build
+            pm2 restart winnners-selection-portal-frontend
