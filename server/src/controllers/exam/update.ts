@@ -3,7 +3,7 @@ import { prisma } from "../../lib";
 
 export async function updateExam(req: Request, res: Response): Promise<void> {
   try {
-    const { id, description, examDate, name } = req.body;
+    const { id, description, examDate, boardId, name } = req.body;
     const updatedExam = await prisma.exam.update({
       where: {
         id,
@@ -12,6 +12,7 @@ export async function updateExam(req: Request, res: Response): Promise<void> {
         description,
         examDate,
         name,
+        boardId,
       },
     });
     res.status(200).json({
