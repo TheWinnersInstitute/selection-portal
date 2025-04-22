@@ -13,16 +13,10 @@ jobs:
       - name: Check required secrets
         run: |
           missing=false
-          for secret in SSH_PRIVATE_KEY; do
-            if [ -z "${!secret}" ]; then
-              echo "Warning: Secret $secret is missing!"
-              missing=true
-            fi
-          done
 
-          if [ "$missing" = true ]; then
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "Warning: Secret SSH_PRIVATE_KEY is missing!"
             echo "skip=true" >> $GITHUB_ENV
-            export skip=true
           fi
 
       - name: Add to known hosts
