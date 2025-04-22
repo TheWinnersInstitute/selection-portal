@@ -22,6 +22,9 @@ export class S3 {
     });
 
     this.uploadFile = multer({
+      limits: {
+        fileSize: 20 * 1024 * 1024,
+      },
       storage: multerS3({
         s3: new S3Client({
           credentials: {
@@ -43,6 +46,9 @@ export class S3 {
       }),
     });
     this.uploadResult = multer({
+      limits: {
+        fileSize: 20 * 1024 * 1024,
+      },
       storage: multerS3({
         s3: new S3Client({
           credentials: {
