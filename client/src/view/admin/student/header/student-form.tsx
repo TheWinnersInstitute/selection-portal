@@ -308,7 +308,9 @@ export default function StudentForm({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a city" />
+                            <SelectValue
+                              placeholder={`Select a ${input.name}`}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
