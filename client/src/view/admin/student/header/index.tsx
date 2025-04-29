@@ -38,7 +38,7 @@ type Props = {
   setSelectedExamId: React.Dispatch<React.SetStateAction<string | null>>;
   triggerRefetchStudents: () => void;
   searchHandler: (q: string) => void;
-  studentsToDelete: string[];
+  studentsToDelete: BooleanMap;
 };
 
 export default function Header({

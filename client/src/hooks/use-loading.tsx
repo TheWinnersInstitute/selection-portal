@@ -15,7 +15,13 @@ export function useLoading(initialState = false) {
         if (error.response?.status === 401) {
           setUnauthorized(true);
         }
-        toast(error.response?.data?.message || "Something went wrong");
+        if (error.response?.data instanceof Blob) {
+          const text = await error.response?.data.text();
+          const data = JSON.parse(text);
+          toast(data?.message || "Something went wrong");
+        } else {
+          toast(error.response?.data?.message || "Something went wrong");
+        }
       }
     }
     setLoading(false);

@@ -44,6 +44,8 @@ jobs:
 
             cd server
             npm install
+            npx prisma migrate deploy
+            npx prisma generate
             npx tsc -b
             pm2 restart winnners-selection-portal-backend
             cd ../client

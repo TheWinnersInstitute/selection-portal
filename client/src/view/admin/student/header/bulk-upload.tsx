@@ -2,15 +2,16 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
 import { useLoading } from "@/hooks/use-loading";
+import { useModel } from "@/hooks/use-model";
 import { studentPdf } from "@/lib/utils";
 import { AxiosError } from "axios";
-import { Delete, Download, Trash2, Upload } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { Download, Trash2, Upload } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
   triggerRefetchStudents: () => void;
-  studentsToDelete: string[];
+  studentsToDelete: BooleanMap;
 };
 
 export default function BulkUpload({
@@ -28,8 +29,22 @@ export default function BulkUpload({
   const downloadingStudentData = useLoading();
   const uploadingFile = useLoading();
   const downloadingPdf = useLoading();
-  const downloadingErroredData = useLoading();
+  // const downloadingErroredData = useLoading();
   const deleting = useLoading();
+
+  const deleteStudentsModel = useModel(
+    "Are you sure you want to delete this student ??"
+  );
+  const downloadErroredData = useModel(
+    "Are you sure you want to download errored data ??"
+  );
+  const downloadStudentsExcelData = useModel(
+    "Are you sure you want to download students data excel ??"
+  );
+
+  const downloadStudentsPDFData = useModel(
+    "Are you sure you want to download students data pdf ??"
+  );
 
   useEffect(() => {
     if (pooling && isAuthenticated) {
@@ -52,20 +67,26 @@ export default function BulkUpload({
     return () => {};
   }, [pooling, isAuthenticated]);
 
+  const studentsListToDelete = useMemo(() => {
+    return Object.keys(studentsToDelete).filter((key) => studentsToDelete[key]);
+  }, [studentsToDelete]);
+
   const bulkDeleteHandler = () => {
     deleting.asyncWrapper(async () => {
-      if (studentsToDelete.length === 0) {
+      if (studentsListToDelete.length === 0) {
         toast("Please select students to delete");
         return;
       }
       await Promise.all(
-        studentsToDelete.map((id) => {
+        studentsListToDelete.map((id) => {
           return (async () => {
             await apiClient.delete(`/api/student/${id}`);
             setStudents((prev) => prev.filter((student) => student.id !== id));
           })();
         })
       );
+      deleteStudentsModel.toggleModel();
+      toast("Students deleted successfully");
     });
   };
 
@@ -92,86 +113,96 @@ export default function BulkUpload({
     });
   };
 
-  const downloadPfdHandler = () => {
-    downloadingPdf.asyncWrapper(async () => {
-      const { data } = await apiClient.get("/api/student", {
-        params: {
-          take: 10000,
-        },
-      });
-      await studentPdf(data.data);
+  const downloadPfdHandler = async () => {
+    const { data } = await apiClient.get("/api/student", {
+      params: {
+        take: 10000,
+      },
     });
+    if (data.data.length === 0) {
+      toast("No students found");
+      return;
+    }
+    await studentPdf(data.data);
   };
 
-  const downloadErroredDataHandler = () => {
-    downloadingErroredData.asyncWrapper(async () => {
-      try {
-        const response = await apiClient.get("/api/student/bulk-error", {
-          responseType: "blob",
-        });
-
-        const blob = new Blob([response.data], {
-          type: response.headers["content-type"],
-        });
-        const url = window.URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "errored-data.xlsx");
-        document.body.appendChild(link);
-        link.click();
-
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          toast(error.response?.data?.message || "No error data available");
-        }
-      }
+  const downloadErroredDataHandler = async () => {
+    const response = await apiClient.get("/api/student/bulk-error", {
+      responseType: "blob",
     });
+
+    const blob = new Blob([response.data], {
+      type: response.headers["content-type"],
+    });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "errored-data.xlsx");
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    downloadErroredData.toggleModel();
   };
 
-  const downloadStudentsDataHandler = () => {
-    downloadingStudentData.asyncWrapper(async () => {
-      try {
-        const response = await apiClient.get("/api/student/bulk", {
-          responseType: "blob",
-        });
-
-        const blob = new Blob([response.data], {
-          type: response.headers["content-type"],
-        });
-        const url = window.URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "students-data.xlsx");
-        document.body.appendChild(link);
-        link.click();
-
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          toast(error.response?.data?.message || "No error data available");
-        }
-      }
+  const downloadStudentsDataHandler = async () => {
+    const response = await apiClient.get("/api/student/bulk", {
+      responseType: "blob",
     });
+
+    const blob = new Blob([response.data], {
+      type: response.headers["content-type"],
+    });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "students-data.xlsx");
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
+
   return (
     <>
-      <Button onClick={bulkDeleteHandler}>
-        <Trash2 /> {deleting.loader || " Students"}
-      </Button>
-      <Button onClick={downloadPfdHandler}>
+      {studentsListToDelete.length > 0 && (
+        <>
+          <Button
+            className="fixed bottom-10 right-10 z-50"
+            onClick={deleteStudentsModel.toggleModel}
+          >
+            <Trash2 /> {studentsListToDelete.length} students
+          </Button>
+
+          {deleteStudentsModel.content(
+            <div className="flex justify-end items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={deleteStudentsModel.toggleModel}
+              >
+                Cancel
+              </Button>
+              <Button onClick={bulkDeleteHandler}>
+                {deleting.loader || "Delete"}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+      <Button onClick={downloadStudentsPDFData.toggleModel}>
         <Download /> {" PDF"}
       </Button>
-      <Button onClick={downloadStudentsDataHandler}>
-        <Download /> {downloadingStudentData.loader || " Excel"}
+      <Button onClick={downloadStudentsExcelData.toggleModel}>
+        <Download /> Excel
       </Button>
-      <Button onClick={downloadErroredDataHandler}>
-        <Download /> {downloadingErroredData.loader || " Errored data"}
+      <Button onClick={downloadErroredData.toggleModel}>
+        <Download /> Errored data
       </Button>
+
       <input
         multiple={false}
         accept=".xlsx"
@@ -187,6 +218,18 @@ export default function BulkUpload({
         <Upload />
         {uploadingFile.loader || (pooling ? ` ${underProcess}` : " Bulk")}
       </Button>
+      {downloadErroredData.confirmationModel(
+        "Download",
+        downloadErroredDataHandler
+      )}
+      {downloadStudentsExcelData.confirmationModel(
+        "Download",
+        downloadStudentsDataHandler
+      )}
+      {downloadStudentsPDFData.confirmationModel(
+        "Download",
+        downloadPfdHandler
+      )}
     </>
   );
 }

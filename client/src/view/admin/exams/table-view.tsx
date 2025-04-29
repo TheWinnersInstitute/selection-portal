@@ -38,7 +38,9 @@ const ExamRow = ({
   return (
     <TableRow key={exam.id}>
       <TableCell>{index + 1}</TableCell>
-      <TableCell>{exam.name}</TableCell>
+      <TableCell>
+        {exam.name} ({exam.enrollmentCount})
+      </TableCell>
       <TableCell>{boardsMap[exam.boardId]?.name}</TableCell>
       <TableCell>{exam.description.slice(0, 40) || " "}</TableCell>
       <TableCell className="space-x-1">

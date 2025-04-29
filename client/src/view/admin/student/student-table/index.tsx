@@ -40,7 +40,8 @@ type Props = {
   studentsPerPage: number;
   setStudentsPerPage: React.Dispatch<React.SetStateAction<number>>;
   loader: React.JSX.Element | null;
-  setStudentsToDelete: React.Dispatch<React.SetStateAction<string[]>>;
+  setStudentsToDelete: React.Dispatch<React.SetStateAction<BooleanMap>>;
+  studentsToDelete: BooleanMap;
 };
 
 export default function StudentTable({
@@ -52,6 +53,7 @@ export default function StudentTable({
   studentsPerPage,
   loader,
   setStudentsToDelete,
+  studentsToDelete,
 }: Props) {
   const [showViewStudentModel, setShowViewStudentModel] = useState(false);
   const [currentStudent, setCurrentStudent] = useState<null | Student>(null);
@@ -69,6 +71,19 @@ export default function StudentTable({
 
   const toggleViewStudent = () => setShowViewStudentModel((prev) => !prev);
 
+  const selectAllToDelete = (value: boolean) => {
+    if (value) {
+      setStudentsToDelete(
+        students.reduce((acc, student) => {
+          acc[student.id] = true;
+          return acc;
+        }, {} as BooleanMap)
+      );
+    } else {
+      setStudentsToDelete({});
+    }
+  };
+
   return (
     <>
       {students.length === 0 && !loader && (
@@ -78,16 +93,19 @@ export default function StudentTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{/* <Checkbox /> */}</TableHead>
+              <TableHead>
+                <Checkbox onCheckedChange={selectAllToDelete} />
+              </TableHead>
               <TableHead>Profile</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Mobile Number</TableHead>
-              <TableHead className="text-center">
+              <TableHead className="text-center w-[40vw]">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Post</TableHead>
-                      <TableHead className="text-center">Rank</TableHead>
+                      <TableHead className="w-20">Post</TableHead>
+                      <TableHead className="w-20">S.In</TableHead>
+                      <TableHead className="w-10">Rank</TableHead>
                       <TableHead>Exam</TableHead>
                       <TableHead>Roll number</TableHead>
                     </TableRow>
@@ -103,6 +121,7 @@ export default function StudentTable({
               .map((student, index) => {
                 return (
                   <StudentTableRow
+                    studentsToDelete={studentsToDelete}
                     setStudentsToDelete={setStudentsToDelete}
                     key={student.id}
                     setCurrentStudent={setCurrentStudent}

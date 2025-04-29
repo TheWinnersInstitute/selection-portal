@@ -55,7 +55,17 @@ export class RedisClient {
             rollNumber,
             email,
             rank,
+            selectionIn,
           } = shapedObject;
+
+          if (!mobileNumber) {
+            logger({
+              ...row,
+              Message: "Mobile number is required",
+            });
+            this.queueLength--;
+            return;
+          }
 
           let student = await prisma.student.findUnique({
             where: {
@@ -87,6 +97,14 @@ export class RedisClient {
           }
 
           if (exams[examName]) {
+            if (!rollNumber) {
+              logger({
+                ...row,
+                Message: "Roll number is required",
+              });
+              this.queueLength--;
+              return;
+            }
             let enrollment = await prisma.enrollment.findUnique({
               where: {
                 rollNumber_examId: {
@@ -104,6 +122,7 @@ export class RedisClient {
                   resultId: resultId,
                   studentId: student.id,
                   rank: String(rank || "") || null,
+                  selectionIn,
                 },
               });
               if (enrollment && !enrollment.resultId && result)

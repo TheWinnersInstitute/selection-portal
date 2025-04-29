@@ -166,6 +166,8 @@ export default function StudentForm({
         title="Upload profile"
         onChange={handleProfileUpload}
         multiple={false}
+        accept="image/*"
+        showPreview
       />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">

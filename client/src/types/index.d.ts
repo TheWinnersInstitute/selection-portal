@@ -39,6 +39,7 @@ type Enrollment = {
   id: string;
   post: string | null;
   rollNumber: bigint;
+  selectionIn?: string;
   createdAt: Date;
   updatedAt: Date;
   resultId: string | null;
@@ -65,3 +66,5 @@ type User = {
   email: string;
   role: Role | null;
 };
+
+type BooleanMap = { [key: string]: boolean };

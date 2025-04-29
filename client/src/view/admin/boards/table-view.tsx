@@ -40,7 +40,9 @@ const BoardRow = ({
   return (
     <TableRow key={board.id}>
       <TableCell>{index + 1}</TableCell>
-      <TableCell>{board.name}</TableCell>
+      <TableCell>
+        {board.name} ({board.enrollmentCount || 0})
+      </TableCell>
       <TableCell>
         {board.description.length > 40
           ? `${board.description.slice(0, 40)}...`

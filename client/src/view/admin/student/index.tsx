@@ -33,7 +33,7 @@ export default function AdminStudentsPage() {
   const [total, setTotal] = useState(-1);
   const [studentsPerPage, setStudentsPerPage] = useState(25);
   const [search, setSearch] = useState("");
-  const [studentsToDelete, setStudentsToDelete] = useState<string[]>([]);
+  const [studentsToDelete, setStudentsToDelete] = useState<BooleanMap>({});
 
   const { apiClient, isAuthenticated } = useAuth();
   const { setStudents, students } = useData();
@@ -132,6 +132,7 @@ export default function AdminStudentsPage() {
         searchHandler={searchHandler}
       />
       <StudentTable
+        studentsToDelete={studentsToDelete}
         setStudentsToDelete={setStudentsToDelete}
         editHandler={(student) => {
           setEditData(student);

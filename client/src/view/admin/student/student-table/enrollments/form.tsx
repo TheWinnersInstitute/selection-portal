@@ -51,6 +51,7 @@ export default function EnrollmentForm({
       post: "",
       rollNumber: "",
       rank: "",
+      selectionIn: "",
     },
   });
 
@@ -73,6 +74,8 @@ export default function EnrollmentForm({
         if (values.post) formData.append("post", values.post);
         if (values.rank) formData.append("rank", values.rank);
         if (values.rollNumber) formData.append("rollNumber", values.rollNumber);
+        if (values.selectionIn)
+          formData.append("selectionIn", values.selectionIn);
 
         const { data } = await apiClient.post(
           "/api/student/enrollment",
@@ -182,6 +185,23 @@ export default function EnrollmentForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="selectionIn"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Selection in</FormLabel>
+                <FormControl>
+                  <Input
+                    type="string"
+                    placeholder="Enter selection in"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <DialogFooter className="justify-between">
             <DialogClose asChild>
               <Button
@@ -204,6 +224,7 @@ export const EnrollmentFormSchema = z.object({
   post: z.string({ message: "Post is request" }),
   examId: z.string({ message: "Please select exam" }),
   rank: z.string().optional(),
+  selectionIn: z.string().optional(),
   rollNumber: z
     .string({ message: "Please enter the roll number" })
     .min(1)

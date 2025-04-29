@@ -6,7 +6,7 @@ export async function createEnrollment(
   res: Response
 ): Promise<void> {
   try {
-    const { post, studentId, examId, rank, rollNumber } = req.body;
+    const { post, studentId, examId, rank, rollNumber, selectionIn } = req.body;
 
     let resultId;
     if (req.file) {
@@ -28,6 +28,7 @@ export async function createEnrollment(
         studentId,
         post,
         resultId,
+        selectionIn,
       },
       include: {
         exam: true,

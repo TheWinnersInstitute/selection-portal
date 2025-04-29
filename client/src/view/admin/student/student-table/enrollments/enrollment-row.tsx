@@ -20,9 +20,14 @@ type Props = {
   enrollment: Enrollment;
   index: number;
   onDelete: () => void;
+  showDetails?: boolean;
 };
 
-export default function EnrollmentRow({ enrollment, index, onDelete }: Props) {
+export default function EnrollmentRow({
+  enrollment,
+  showDetails,
+  onDelete,
+}: Props) {
   const { apiClient } = useAuth();
 
   const deleting = useLoading();
@@ -39,9 +44,9 @@ export default function EnrollmentRow({ enrollment, index, onDelete }: Props) {
   };
 
   return (
-    <TableRow>
+    <TableRow className="w-[40vw]">
       <TableCell
-        className={`${enrollment?.resultId ? "text-blue-500" : ""}`}
+        className={`${enrollment?.resultId ? "text-blue-500 w-20" : "w-20"}`}
         onClick={(e) => {
           e.stopPropagation();
           const resultId = enrollment?.resultId;
@@ -54,44 +59,43 @@ export default function EnrollmentRow({ enrollment, index, onDelete }: Props) {
           }
         }}
       >
-        <div className="w-20">{enrollment.post}</div>
+        {enrollment.post}
       </TableCell>
-      <TableCell>
+      <TableCell className="w-20">{enrollment.selectionIn || "-"}</TableCell>
+      <TableCell className="w-12 text-center">
         {/* @ts-ignore */}
-        <div className="w-10">{enrollment.rank || "-"}</div>
+        {enrollment.rank || "-"}
       </TableCell>
-      <TableCell>
-        <div className="w-20">{enrollment.exam.name.slice(0, 15)}</div>
-      </TableCell>
-      <TableCell>
-        <div className="w-20">{enrollment.rollNumber}</div>
-      </TableCell>
-      <TableCell>
-        <Button
-          variant="outline"
-          onClick={deleteConfirmationModel.toggleModel}
-          size="icon"
-        >
-          {deleting.loader || <Trash2 />}
-        </Button>
-      </TableCell>
-
-      {deleteConfirmationModel.content(
-        <div className="flex justify-end items-center gap-2">
+      {/* )} */}
+      <TableCell>{enrollment.exam.name.slice(0, 15)}</TableCell>
+      <TableCell>{enrollment.rollNumber}</TableCell>
+      {showDetails && (
+        <TableCell>
           <Button
             variant="outline"
             onClick={deleteConfirmationModel.toggleModel}
+            size="icon"
           >
-            Cancel
+            {deleting.loader || <Trash2 />}
           </Button>
-          <Button
-            onClick={() => {
-              deleteHandler(enrollment.id);
-            }}
-          >
-            {deleting.loader || "Delete"}
-          </Button>
-        </div>
+          {deleteConfirmationModel.content(
+            <div className="flex justify-end items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={deleteConfirmationModel.toggleModel}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  deleteHandler(enrollment.id);
+                }}
+              >
+                {deleting.loader || "Delete"}
+              </Button>
+            </div>
+          )}
+        </TableCell>
       )}
     </TableRow>
   );

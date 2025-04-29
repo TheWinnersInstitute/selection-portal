@@ -1,8 +1,16 @@
-import { cn } from "@/lib/utils";
-import React, { useRef, useState } from "react";
+import { cn, fileToBase64 } from "@/lib/utils";
+import React, {
+  InputHTMLAttributes,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { motion } from "motion/react";
 import { IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
+import { set } from "lodash";
+import Image from "next/image";
 
 const mainVariant = {
   initial: {
@@ -29,13 +37,32 @@ export const FileUpload = ({
   onChange,
   multiple,
   title,
+  accept,
+  showPreview,
 }: {
   onChange?: (files: File[]) => void;
   multiple?: boolean;
   title?: string;
+  accept?: InputHTMLAttributes<HTMLInputElement>["accept"];
+  showPreview?: boolean;
 }) => {
   const [files, setFiles] = useState<File[]>([]);
+  const [filesWithBase64, setFilesWithBase64] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    (async () => {
+      const _files = await Promise.all(
+        files.map(async (file) => {
+          return await fileToBase64(file);
+        })
+      ).catch((error) => {
+        console.log("Error converting files to base64", error);
+        return [] as string[];
+      });
+      setFilesWithBase64(_files);
+    })();
+  }, [files]);
 
   const handleFileChange = (newFiles: File[]) => {
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
@@ -69,6 +96,7 @@ export const FileUpload = ({
           multiple={multiple}
           onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
           className="hidden"
+          accept={accept}
         />
         <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
           <GridPattern />
@@ -86,56 +114,68 @@ export const FileUpload = ({
           )}
           <div className="relative w-full mt-10 max-w-xl mx-auto">
             {files.length > 0 &&
-              files.map((file, idx) => (
-                <motion.div
-                  key={"file" + idx}
-                  layoutId={idx === 0 ? "file-upload" : "file-upload-" + idx}
-                  className={cn(
-                    "relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 mt-4 w-full mx-auto rounded-md",
-                    "shadow-sm"
-                  )}
-                >
-                  <div className="flex justify-between w-full items-center gap-4">
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      layout
-                      className="text-base text-neutral-700 dark:text-neutral-300 truncate max-w-xs"
-                    >
-                      {file.name.slice(0, 20)}
-                      {file.name.length > 20 && "..."}
-                    </motion.p>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      layout
-                      className="rounded-lg px-2 py-1 w-fit shrink-0 text-sm text-neutral-600 dark:bg-neutral-800 dark:text-white shadow-input"
-                    >
-                      {(file.size / (1024 * 1024)).toFixed(2)} MB
-                    </motion.p>
+              (showPreview ? filesWithBase64 : files).map((file, idx) =>
+                typeof file === "string" ? (
+                  <div key={"file" + idx}>
+                    <Image
+                      src={file}
+                      alt="Profile-preview"
+                      width={100}
+                      className="w-auto"
+                      height={50}
+                    />
                   </div>
+                ) : (
+                  <motion.div
+                    key={"file" + idx}
+                    layoutId={idx === 0 ? "file-upload" : "file-upload-" + idx}
+                    className={cn(
+                      "relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 mt-4 w-full mx-auto rounded-md",
+                      "shadow-sm"
+                    )}
+                  >
+                    <div className="flex justify-between w-full items-center gap-4">
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        layout
+                        className="text-base text-neutral-700 dark:text-neutral-300 truncate max-w-xs"
+                      >
+                        {file.name.slice(0, 20)}
+                        {file.name.length > 20 && "..."}
+                      </motion.p>
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        layout
+                        className="rounded-lg px-2 py-1 w-fit shrink-0 text-sm text-neutral-600 dark:bg-neutral-800 dark:text-white shadow-input"
+                      >
+                        {(file.size / (1024 * 1024)).toFixed(2)} MB
+                      </motion.p>
+                    </div>
 
-                  <div className="flex text-sm md:flex-row flex-col items-start md:items-center w-full mt-2 justify-between text-neutral-600 dark:text-neutral-400">
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      layout
-                      className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-neutral-800 "
-                    >
-                      {file.type}
-                    </motion.p>
+                    <div className="flex text-sm md:flex-row flex-col items-start md:items-center w-full mt-2 justify-between text-neutral-600 dark:text-neutral-400">
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        layout
+                        className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-neutral-800 "
+                      >
+                        {file.type}
+                      </motion.p>
 
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      layout
-                    >
-                      modified{" "}
-                      {new Date(file.lastModified).toLocaleDateString()}
-                    </motion.p>
-                  </div>
-                </motion.div>
-              ))}
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        layout
+                      >
+                        modified{" "}
+                        {new Date(file.lastModified).toLocaleDateString()}
+                      </motion.p>
+                    </div>
+                  </motion.div>
+                )
+              )}
             {!files.length && (
               <motion.div
                 layoutId="file-upload"

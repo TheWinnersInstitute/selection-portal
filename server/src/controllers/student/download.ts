@@ -24,6 +24,7 @@ export async function downloadStudentsExcel(req: Request, res: Response) {
           "Exam Name": enrollment.exam.name,
           Post: enrollment.post,
           "Roll Number": enrollment.rollNumber.toString(),
+          "Selection In": enrollment.selectionIn || "-",
           Result: `${process.env.BACKEND_URL}/api/admin/assets/${enrollment.resultId}`,
         };
       });
@@ -31,7 +32,7 @@ export async function downloadStudentsExcel(req: Request, res: Response) {
     if (jsonData.length === 0) {
       res.setHeader("Content-Type", "application/json");
       res.status(400).json({
-        message: "No error data available",
+        message: "No students data available",
       });
       return;
     }

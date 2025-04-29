@@ -120,24 +120,17 @@ export async function studentPdf(students: Student[]) {
         if (column.index === 5 && student.Enrollment) {
           doc.setTextColor(0, 0, 255);
           student.Enrollment.forEach((enrollment, index) => {
+            const text =
+              enrollment.exam.name +
+              `${enrollment.selectionIn ? ` - ${enrollment.selectionIn}` : ""}`;
             if (enrollment.resultId) {
-              doc.textWithLink(
-                enrollment.exam.name,
-                xCenter,
-                cell.y + 6 + index * 5,
-                {
-                  url: `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${enrollment.resultId}`,
-                  target: "_blank",
-                }
-              );
+              doc.textWithLink(text, xCenter, cell.y + 6 + index * 5, {
+                url: `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${enrollment.resultId}`,
+                target: "_blank",
+              });
             } else {
               doc.setTextColor(0, 0, 0);
-              doc.text(
-                enrollment.exam.name,
-                xCenter,
-                cell.y + 6 + index * 5,
-                {}
-              );
+              doc.text(text, xCenter, cell.y + 6 + index * 5, {});
             }
           });
         }
@@ -151,3 +144,18 @@ export async function studentPdf(students: Student[]) {
     doc.save("all-students-details.pdf");
   }
 }
+
+export const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      if (reader.result && typeof reader.result === "string") {
+        resolve(reader.result);
+      }
+    };
+    reader.onerror = (error) => {
+      reject(error);
+    };
+  });
+};

@@ -28,7 +28,8 @@ type Props = {
   editHandler: (data: Student) => void;
   onClick?: () => void;
   setCurrentStudent: (data: Student | null) => void;
-  setStudentsToDelete: React.Dispatch<React.SetStateAction<string[]>>;
+  setStudentsToDelete: React.Dispatch<React.SetStateAction<BooleanMap>>;
+  studentsToDelete: BooleanMap;
 };
 export default function StudentTableRow({
   student,
@@ -36,6 +37,7 @@ export default function StudentTableRow({
   onClick,
   setCurrentStudent,
   setStudentsToDelete,
+  studentsToDelete,
 }: Props) {
   const nameArray = student.name.split(" ");
 
@@ -68,12 +70,11 @@ export default function StudentTableRow({
     <TableRow onClick={onClick}>
       <TableCell onClick={(e) => e.stopPropagation()}>
         <Checkbox
-          onCheckedChange={(e) => {
+          checked={studentsToDelete[student.id]}
+          onCheckedChange={() => {
             setStudentsToDelete((prev) => {
-              if (e) {
-                return [...prev, student.id];
-              }
-              return prev.filter((id) => id !== student.id);
+              prev[student.id] = !prev[student.id];
+              return { ...prev };
             });
           }}
         />
@@ -105,6 +106,7 @@ export default function StudentTableRow({
       <TableCell>+91 {student.contactNumber}</TableCell>
       <TableCell onClick={(e) => e.stopPropagation()}>
         <EnrollmentsList
+          showDetails={false}
           student={student}
           setCurrentStudent={setCurrentStudent}
         />

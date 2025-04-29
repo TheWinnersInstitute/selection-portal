@@ -13,29 +13,37 @@ import { useData } from "@/context/DataContext";
 type Props = {
   student: Student;
   setCurrentStudent: (data: Student | null) => void;
+  showDetails?: boolean;
 };
 
-export default function EnrollmentsList({ student, setCurrentStudent }: Props) {
+export default function EnrollmentsList({
+  student,
+  setCurrentStudent,
+  showDetails,
+}: Props) {
   const { setStudents } = useData();
   return (
     <div>
       <Table>
-        {/* <TableHeader>
-          <TableRow>
-            <TableHead>S.No.</TableHead>
-            <TableHead>Post</TableHead>
-            <TableHead>Rank</TableHead>
-            <TableHead>Exam</TableHead>
-            <TableHead>Roll number</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader> */}
+        {showDetails && (
+          <TableHeader>
+            <TableRow>
+              <TableHead>Post</TableHead>
+              <TableHead>Rank</TableHead>
+              <TableHead>Selection in</TableHead>
+              <TableHead>Exam</TableHead>
+              <TableHead>Roll number</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+        )}
         <TableBody>
           {student.Enrollment?.map((enrollment, index) => {
             return (
               <EnrollmentRow
                 enrollment={enrollment}
                 index={index}
+                showDetails={showDetails}
                 key={enrollment.id}
                 onDelete={() => {
                   const updatedEnrollment =

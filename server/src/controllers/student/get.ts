@@ -20,6 +20,7 @@ export async function getStudents(req: Request, res: Response): Promise<void> {
       where.OR = [
         { name: { contains: q, mode: "insensitive" } },
         { email: { contains: q, mode: "insensitive" } },
+        { contactNumber: { equals: parseInt(q) || 0 } },
         { city: { contains: q, mode: "insensitive" } },
         { state: { contains: q, mode: "insensitive" } },
         { fatherName: { contains: q, mode: "insensitive" } },

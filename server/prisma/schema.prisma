@@ -92,10 +92,11 @@ model Student {
 }
 
 model Enrollment {
-  id         String  @id @default(uuid())
-  rollNumber BigInt
-  post       String?
-  rank       String?
+  id          String  @id @default(uuid())
+  rollNumber  BigInt
+  post        String?
+  rank        String?
+  selectionIn String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

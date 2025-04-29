@@ -6,9 +6,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useLoading } from "./use-loading";
 
 export function useModel(title: string) {
   const [open, setOpen] = useState(false);
+
+  const deleting = useLoading();
 
   const toggleModel = () => setOpen((prev) => !prev);
 
@@ -31,5 +35,28 @@ export function useModel(title: string) {
     [open]
   );
 
-  return { content, toggleModel };
+  const confirmationModel = useCallback(
+    (action: string, onAction: () => Promise<void>) => {
+      return content(
+        <div className="flex justify-end items-center gap-2">
+          <Button variant="outline" onClick={toggleModel}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              deleting.asyncWrapper(async () => {
+                await onAction();
+                toggleModel();
+              });
+            }}
+          >
+            {deleting.loader || action}
+          </Button>
+        </div>
+      );
+    },
+    [content]
+  );
+
+  return { content, toggleModel, confirmationModel };
 }

@@ -129,6 +129,7 @@ studentRoutes.post(
         .max(100)
         .min(1),
       rank: z.string().optional(),
+      selectionIn: z.string().optional(),
       examId: z.string({ message: "Exam is required" }).uuid(),
     })
   ),

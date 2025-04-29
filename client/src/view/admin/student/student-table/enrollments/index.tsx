@@ -36,6 +36,7 @@ export default function Enrollments({
         {!showEnrollmentForm && currentStudent && (
           <>
             <EnrollmentsList
+              showDetails
               student={currentStudent}
               setCurrentStudent={setCurrentStudent}
             />
