@@ -63,12 +63,27 @@ model Exam {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
-  board      Board        @relation(fields: [boardId], references: [id])
-  user       User         @relation(fields: [userId], references: [id])
-  Enrollment Enrollment[]
+  board        Board          @relation(fields: [boardId], references: [id])
+  user         User           @relation(fields: [userId], references: [id])
+  Enrollment   Enrollment[]
+  ExamCategory ExamCategory[]
 
   @@unique([boardId, name])
   @@map("exams")
+}
+
+model ExamCategory {
+  id   String @id @default(uuid())
+  name String
+  exam Exam   @relation(fields: [examId], references: [id])
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  examId     String
+  Enrollment Enrollment[]
+
+  // @@unique([examId, name])
+  @@map("exam_categories")
 }
 
 model Student {
@@ -107,8 +122,11 @@ model Enrollment {
   student   Student @relation(fields: [studentId], references: [id])
   studentId String
 
-  exam   Exam   @relation(fields: [examId], references: [id])
-  examId String
+  exam           Exam          @relation(fields: [examId], references: [id])
+  examId         String
+  examCategory   ExamCategory? @relation(fields: [examCategoryId], references: [id])
+  year           Int?
+  examCategoryId String?
 
   @@unique([rollNumber, examId])
   @@map("enrollments")

@@ -48,6 +48,7 @@ export async function createStudent(
           include: {
             result: true,
             exam: true,
+            examCategory: true,
           },
         },
       },

@@ -19,6 +19,8 @@ import { useSearchParams } from "next/navigation";
 
 // export const STUDENTS_PER_PAGE = 5;
 
+type Search = { [key: string]: string };
+
 export default function AdminStudentsPage() {
   const searchParams = useSearchParams();
 
@@ -32,7 +34,7 @@ export default function AdminStudentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(-1);
   const [studentsPerPage, setStudentsPerPage] = useState(25);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<Search>({});
   const [studentsToDelete, setStudentsToDelete] = useState<BooleanMap>({});
 
   const { apiClient, isAuthenticated } = useAuth();
@@ -56,14 +58,14 @@ export default function AdminStudentsPage() {
   const fetchStudents = async (
     skip: number,
     examId: string | null,
-    q?: string
+    search?: Search
   ) => {
     if (fetchingStudents.loading) return;
     try {
       const { data } = await apiClient.get("/api/student", {
         params: {
           ...(examId ? { examId } : {}),
-          ...(q ? { q } : {}),
+          ...search,
           skip,
           take: studentsPerPage,
         },
@@ -99,10 +101,13 @@ export default function AdminStudentsPage() {
     }
   }, [currentPage, total, studentsPerPage, isAuthenticated]);
 
-  const searchHandler = (q: string) => {
+  const searchHandler = (key: string, value: string) => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     searchTimeout.current = setTimeout(() => {
-      setSearch(q);
+      setSearch((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
     }, 500);
   };
 

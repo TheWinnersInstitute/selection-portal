@@ -8,6 +8,9 @@ export async function getExams(req: Request, res: Response): Promise<void> {
       where: {
         ...(typeof boardId === "string" ? { boardId } : {}),
       },
+      include: {
+        ExamCategory: true,
+      },
     });
 
     const examIds = exams.map((exam) => exam.id);
@@ -28,7 +31,12 @@ export async function getExams(req: Request, res: Response): Promise<void> {
       message: "success",
       data: exams.map((exam) => {
         return {
-          ...exam,
+          id: exam.id,
+          name: exam.name,
+          description: exam.description,
+          examDate: exam.examDate,
+          boardId: exam.boardId,
+          examCategories: exam.ExamCategory,
           enrollmentCount: enrollmentMap[exam.id] || 0,
         };
       }),

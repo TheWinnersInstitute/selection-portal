@@ -17,7 +17,12 @@ export async function createExam(req: Request, res: Response): Promise<void> {
     });
     res.status(200).json({
       message: "Exam created successfully",
-      data: [exam],
+      data: [
+        {
+          ...exam,
+          examCategories: [],
+        },
+      ],
     });
   } catch (error) {
     if (error instanceof Error)

@@ -61,13 +61,17 @@ export default function EnrollmentRow({
       >
         {enrollment.post}
       </TableCell>
-      <TableCell className="w-20">{enrollment.selectionIn || "-"}</TableCell>
       <TableCell className="w-12 text-center">
         {/* @ts-ignore */}
         {enrollment.rank || "-"}
       </TableCell>
+      {showDetails && (
+        <TableCell className="w-20">{enrollment.selectionIn || "-"}</TableCell>
+      )}
+
       {/* )} */}
       <TableCell>{enrollment.exam.name.slice(0, 15)}</TableCell>
+      <TableCell>{enrollment.examCategory?.name || "-"}</TableCell>
       <TableCell>{enrollment.rollNumber}</TableCell>
       {showDetails && (
         <TableCell>

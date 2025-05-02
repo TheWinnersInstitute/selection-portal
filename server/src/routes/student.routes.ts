@@ -131,6 +131,11 @@ studentRoutes.post(
       rank: z.string().optional(),
       selectionIn: z.string().optional(),
       examId: z.string({ message: "Exam is required" }).uuid(),
+      examCategoryId: z
+        .string({ message: "Exam is required" })
+        .uuid()
+        .optional(),
+      year: z.string().optional(),
     })
   ),
   createEnrollment

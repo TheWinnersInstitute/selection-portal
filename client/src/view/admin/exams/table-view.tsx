@@ -14,6 +14,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { useLoading } from "@/hooks/use-loading";
 import { Pen, Trash2 } from "lucide-react";
+import { set } from "lodash";
 
 const ExamRow = ({
   exam,
@@ -22,6 +23,7 @@ const ExamRow = ({
   form,
   index,
   boardsMap,
+  setSelectedRow,
 }: ExamRowProps) => {
   const { apiClient } = useAuth();
   const { setExams } = useData();
@@ -36,14 +38,17 @@ const ExamRow = ({
   };
 
   return (
-    <TableRow key={exam.id}>
+    <TableRow onClick={() => setSelectedRow(exam)} key={exam.id}>
       <TableCell>{index + 1}</TableCell>
       <TableCell>
         {exam.name} ({exam.enrollmentCount})
       </TableCell>
       <TableCell>{boardsMap[exam.boardId]?.name}</TableCell>
-      <TableCell>{exam.description.slice(0, 40) || " "}</TableCell>
-      <TableCell className="space-x-1">
+      <TableCell>
+        {exam.examCategories.map((category) => category.name).join(", ") || "-"}
+      </TableCell>
+      <TableCell>{exam.description.slice(0, 40) || "-"}</TableCell>
+      <TableCell onClick={(e) => e.stopPropagation()} className="space-x-1">
         <Button
           variant="outline"
           onClick={() => {
@@ -77,6 +82,7 @@ export default function ExamTableView({
   form,
   setEditData,
   toggleExamForm,
+  setSelectedRow,
 }: Props) {
   const { exams } = useData();
 
@@ -88,6 +94,7 @@ export default function ExamTableView({
           <TableHead>S.No.</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Board</TableHead>
+          <TableHead>Categories</TableHead>
           <TableHead>Description</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
@@ -102,6 +109,7 @@ export default function ExamTableView({
             form={form}
             toggleExamForm={toggleExamForm}
             boardsMap={boardsMap}
+            setSelectedRow={setSelectedRow}
           />
         ))}
       </TableBody>
@@ -116,9 +124,11 @@ type Props = {
   setEditData: (data: Exam | null) => void;
   form: any;
   toggleExamForm: () => void;
+  setSelectedRow: (exam: Exam | null) => void;
 };
 
 interface ExamRowProps extends Props {
   index: number;
   exam: Exam;
+  setSelectedRow: (exam: Exam | null) => void;
 }

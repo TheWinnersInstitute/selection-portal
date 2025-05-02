@@ -22,7 +22,7 @@ import { useData } from "@/context/DataContext";
 import { useLoading } from "@/hooks/use-loading";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -52,8 +52,12 @@ export default function EnrollmentForm({
       rollNumber: "",
       rank: "",
       selectionIn: "",
+      examCategoryId: "",
+      year: new Date().getFullYear(),
     },
   });
+
+  const [examId] = form.watch(["examId"]);
 
   const handleProfileUpload = (files: File[]) => {
     if (files.length > 0) {
@@ -76,6 +80,9 @@ export default function EnrollmentForm({
         if (values.rollNumber) formData.append("rollNumber", values.rollNumber);
         if (values.selectionIn)
           formData.append("selectionIn", values.selectionIn);
+        if (values.examCategoryId)
+          formData.append("examCategoryId", values.examCategoryId);
+        if (values.year) formData.append("year", values.year.toString());
 
         const { data } = await apiClient.post(
           "/api/student/enrollment",
@@ -103,6 +110,14 @@ export default function EnrollmentForm({
       }
     });
   };
+
+  const examCategories = useMemo(() => {
+    const exam = exams.find((exam) => exam.id === examId);
+    if (exam) {
+      return exam.examCategories;
+    }
+    return [];
+  }, [examId, exams]);
 
   return (
     <div>
@@ -185,16 +200,67 @@ export default function EnrollmentForm({
               </FormItem>
             )}
           />
+          {examCategories.length > 0 && (
+            <FormField
+              control={form.control}
+              name="examCategoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Exam category</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {examCategories.map((category) => {
+                        return (
+                          <SelectItem value={category.id} key={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          <FormField
+            control={form.control}
+            name="year"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Year</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    maxLength={4}
+                    placeholder="Enrollment year"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="selectionIn"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Selection in</FormLabel>
+                <FormLabel>Selection In</FormLabel>
                 <FormControl>
                   <Input
                     type="string"
-                    placeholder="Enter selection in"
+                    placeholder="Enter year of selection"
                     {...field}
                   />
                 </FormControl>
@@ -225,6 +291,8 @@ export const EnrollmentFormSchema = z.object({
   examId: z.string({ message: "Please select exam" }),
   rank: z.string().optional(),
   selectionIn: z.string().optional(),
+  examCategoryId: z.string().optional(),
+  year: z.number().optional(),
   rollNumber: z
     .string({ message: "Please enter the roll number" })
     .min(1)

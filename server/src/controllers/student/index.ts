@@ -1,4 +1,11 @@
-import { Asset, Enrollment, Exam, Student } from "@prisma/client";
+import {
+  Asset,
+  Enrollment,
+  Exam,
+  ExamCategory,
+  Prisma,
+  Student,
+} from "@prisma/client";
 
 export * from "./create";
 export * from "./delete";
@@ -11,12 +18,14 @@ export const studentInclude = {
   Enrollment: {
     include: {
       exam: true,
+      examCategory: true,
     },
   },
 };
 
 interface EnrollmentType extends Enrollment {
   exam: Exam;
+  examCategory: ExamCategory | null;
 }
 
 interface StudentType extends Student {

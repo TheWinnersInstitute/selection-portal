@@ -46,7 +46,7 @@ export default function ExamForm({
   form,
   setEditData,
   showAddBoardForm,
-  toggleAddBoardForm,
+  toggleExamForm,
 }: Props) {
   const processingExam = useLoading();
   const { apiClient } = useAuth();
@@ -75,17 +75,17 @@ export default function ExamForm({
         setExams((prev) => [...prev, data.data[0]]);
       }
       form.reset();
-      toggleAddBoardForm();
+      toggleExamForm();
     });
   };
 
   return (
-    <Dialog open={showAddBoardForm} onOpenChange={toggleAddBoardForm}>
+    <Dialog open={showAddBoardForm} onOpenChange={toggleExamForm}>
       <Button
         onClick={() => {
           form.reset();
           setEditData(null);
-          toggleAddBoardForm();
+          toggleExamForm();
         }}
         variant="outline"
       >
@@ -189,6 +189,7 @@ export default function ExamForm({
                 </FormItem>
               )}
             />
+
             <DialogFooter className="justify-between">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
@@ -211,5 +212,5 @@ type Props = {
   editData: null | Exam;
   setEditData: React.Dispatch<React.SetStateAction<null | Exam>>;
   form: UseFormReturn<z.infer<typeof ExamFormSchema>, any, undefined>;
-  toggleAddBoardForm: () => void;
+  toggleExamForm: () => void;
 };

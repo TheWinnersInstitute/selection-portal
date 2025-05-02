@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import ExamGridView from "./grid-view";
 import ExamTableView from "./table-view";
+import ExamCategory from "./exam-category";
 
 export const ExamFormSchema = z.object({
   name: z
@@ -44,9 +45,11 @@ const ClientExamsPage = () => {
   const [showAddBoardForm, setShowAddBoardForm] = useState(false);
   const [gridView, setGridView] = useState(false);
 
-  const toggleAddBoardForm = () => setShowAddBoardForm((prev) => !prev);
+  const [selectedRow, setSelectedRow] = useState<Exam | null>(null);
 
   const searchParams = useSearchParams();
+
+  const toggleExamForm = () => setShowAddBoardForm((prev) => !prev);
 
   const form = useForm<z.infer<typeof ExamFormSchema>>({
     resolver: zodResolver(ExamFormSchema),
@@ -101,7 +104,7 @@ const ClientExamsPage = () => {
             form={form}
             setEditData={setEditData}
             showAddBoardForm={showAddBoardForm}
-            toggleAddBoardForm={toggleAddBoardForm}
+            toggleExamForm={toggleExamForm}
           />
         </div>
       </div>
@@ -113,7 +116,7 @@ const ClientExamsPage = () => {
           boardsMap={boardsMap}
           form={form}
           setEditData={setEditData}
-          toggleExamForm={toggleAddBoardForm}
+          toggleExamForm={toggleExamForm}
         />
       )}
       {!gridView && (
@@ -121,9 +124,16 @@ const ClientExamsPage = () => {
           boardsMap={boardsMap}
           form={form}
           setEditData={setEditData}
-          toggleExamForm={toggleAddBoardForm}
+          toggleExamForm={toggleExamForm}
+          setSelectedRow={setSelectedRow}
         />
       )}
+      <ExamCategory
+        selectedRow={selectedRow}
+        setSelectedRow={setSelectedRow}
+        exam={selectedRow}
+        setEditData={setEditData}
+      />
     </div>
   );
 };

@@ -104,9 +104,10 @@ export default function StudentTable({
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-20">Post</TableHead>
-                      <TableHead className="w-20">S.In</TableHead>
+                      {/* <TableHead className="w-20">S.In</TableHead> */}
                       <TableHead className="w-10">Rank</TableHead>
                       <TableHead>Exam</TableHead>
+                      <TableHead>Category</TableHead>
                       <TableHead>Roll number</TableHead>
                     </TableRow>
                   </TableHeader>

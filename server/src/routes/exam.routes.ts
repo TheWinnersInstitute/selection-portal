@@ -7,6 +7,10 @@ import {
 } from "../controllers/exam";
 import { checkReturnPayload, checkAccess, checkAuth } from "../middleware";
 import { z } from "zod";
+import {
+  createExamCategory,
+  deleteExamCategory,
+} from "../controllers/exam/category";
 
 export const examRoutes = Router();
 
@@ -52,4 +56,30 @@ examRoutes.patch(
     })
   ),
   updateExam
+);
+
+examRoutes.post(
+  "/category",
+  checkAuth,
+  checkAccess("exam", "create"),
+  checkReturnPayload(
+    z.object({
+      name: z.string().max(100).min(1),
+      examId: z.string().uuid(),
+    })
+  ),
+  createExamCategory
+);
+
+examRoutes.delete(
+  "/category/:id",
+  checkAuth,
+  checkAccess("exam", "delete"),
+  checkReturnPayload(
+    z.object({
+      id: z.string().uuid(),
+    }),
+    "params"
+  ),
+  deleteExamCategory
 );

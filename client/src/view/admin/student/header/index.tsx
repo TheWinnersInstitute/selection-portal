@@ -37,7 +37,7 @@ type Props = {
   form: UseFormReturn<StudentFormValues, any, undefined>;
   setSelectedExamId: React.Dispatch<React.SetStateAction<string | null>>;
   triggerRefetchStudents: () => void;
-  searchHandler: (q: string) => void;
+  searchHandler: (key: string, value: string) => void;
   studentsToDelete: BooleanMap;
 };
 
@@ -58,7 +58,7 @@ export default function Header({
     <div className="flex justify-between items-center gap-3 pt-3 mb-3">
       <Input
         placeholder="Search..."
-        onChange={(e) => searchHandler(e.target.value)}
+        onChange={(e) => searchHandler("q", e.target.value)}
       />
       <div className="flex items-center gap-3">
         <Select
@@ -85,6 +85,10 @@ export default function Header({
             </SelectGroup>
           </SelectContent>
         </Select>
+        <Input
+          placeholder="Search..."
+          onChange={(e) => searchHandler("year", e.target.value)}
+        />
         <BulkUpload
           studentsToDelete={studentsToDelete}
           triggerRefetchStudents={triggerRefetchStudents}

@@ -16,6 +16,13 @@ type Exam = {
   examDate: Date;
   enrollmentCount: number;
   examStatus: "pending" | "ongoing" | "completed";
+  examCategories: ExamCategory[];
+};
+
+type ExamCategory = {
+  id: string;
+  name: string;
+  examId: string;
 };
 
 type Student = {
@@ -45,6 +52,7 @@ type Enrollment = {
   resultId: string | null;
   studentId: string;
   examId: string;
+  examCategory: ExamCategory;
   exam: Exam;
 };
 

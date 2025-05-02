@@ -56,6 +56,8 @@ export class RedisClient {
             email,
             rank,
             selectionIn,
+            year,
+            category,
           } = shapedObject;
 
           if (!mobileNumber) {
@@ -105,6 +107,21 @@ export class RedisClient {
               this.queueLength--;
               return;
             }
+            const examCategory = await prisma.examCategory.findFirst({
+              where: {
+                examId: exams[examName],
+                name: category,
+              },
+            });
+
+            if (!examCategory && category) {
+              logger({
+                ...row,
+                Message: "Exam category not found",
+              });
+              this.queueLength--;
+              return;
+            }
             let enrollment = await prisma.enrollment.findUnique({
               where: {
                 rollNumber_examId: {
@@ -123,6 +140,8 @@ export class RedisClient {
                   studentId: student.id,
                   rank: String(rank || "") || null,
                   selectionIn,
+                  year: parseInt(year, 10) || null,
+                  examCategoryId: examCategory?.id,
                 },
               });
               if (enrollment && !enrollment.resultId && result)

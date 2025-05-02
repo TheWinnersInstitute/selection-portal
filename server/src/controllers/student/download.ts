@@ -16,7 +16,9 @@ export async function downloadStudentsExcel(req: Request, res: Response) {
         Name: student.name,
         Email: student.email || "",
         MobileNumber: student.contactNumber.toString(),
-        Photo: `${process.env.BACKEND_URL}/api/admin/assets/${student.imageId}`,
+        Photo: student.imageId
+          ? `${process.env.BACKEND_URL}/api/admin/assets/${student.imageId}`
+          : "",
       };
       return student.Enrollment.map((enrollment) => {
         return {
@@ -25,7 +27,12 @@ export async function downloadStudentsExcel(req: Request, res: Response) {
           Post: enrollment.post,
           "Roll Number": enrollment.rollNumber.toString(),
           "Selection In": enrollment.selectionIn || "-",
-          Result: `${process.env.BACKEND_URL}/api/admin/assets/${enrollment.resultId}`,
+          Category: enrollment.examCategory?.name || "-",
+          Rank: enrollment.rank || "-",
+          Year: enrollment.year || "-",
+          Result: enrollment.resultId
+            ? `${process.env.BACKEND_URL}/api/admin/assets/${enrollment.resultId}`
+            : "",
         };
       });
     });

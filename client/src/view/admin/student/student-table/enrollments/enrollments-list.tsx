@@ -32,6 +32,7 @@ export default function EnrollmentsList({
               <TableHead>Rank</TableHead>
               <TableHead>Selection in</TableHead>
               <TableHead>Exam</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Roll number</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>

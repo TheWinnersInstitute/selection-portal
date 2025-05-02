@@ -5,16 +5,16 @@ import { Prisma } from "@prisma/client";
 
 export async function getStudents(req: Request, res: Response): Promise<void> {
   try {
-    const { skip, examId, take, q } = req.query;
+    const { skip, examId, take, q, year } = req.query;
 
     const where: Prisma.StudentWhereInput = {};
-    if (typeof examId === "string") {
-      where.Enrollment = {
-        some: {
-          examId,
-        },
-      };
-    }
+
+    where.Enrollment = {
+      some: {
+        examId: typeof examId === "string" ? examId : undefined,
+        year: typeof year === "string" ? parseInt(year, 10) : undefined,
+      },
+    };
 
     if (typeof q === "string") {
       where.OR = [
