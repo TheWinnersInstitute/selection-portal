@@ -15,6 +15,12 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { Trash2 } from "lucide-react";
 import { useModel } from "@/hooks/use-model";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Props = {
   enrollment: Enrollment;
@@ -44,9 +50,11 @@ export default function EnrollmentRow({
   };
 
   return (
-    <TableRow className="w-[40vw]">
+    <TableRow className="w-[40vw] text-xs">
       <TableCell
-        className={`${enrollment?.resultId ? "text-blue-500 w-20" : "w-20"}`}
+        className={`${
+          enrollment?.resultId ? "text-blue-500 " : ""
+        } w-[10vw] text-xs`}
         onClick={(e) => {
           e.stopPropagation();
           const resultId = enrollment?.resultId;
@@ -59,9 +67,24 @@ export default function EnrollmentRow({
           }
         }}
       >
-        {enrollment.post}
+        {enrollment.post && enrollment.post.length > 15 ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <TooltipTrigger>
+                  {enrollment.post.slice(0, 15)}...
+                </TooltipTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{enrollment.post}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          enrollment.post || "-"
+        )}
       </TableCell>
-      <TableCell className="w-12 text-center">
+      <TableCell className="w-[5vw]">
         {/* @ts-ignore */}
         {enrollment.rank || "-"}
       </TableCell>
