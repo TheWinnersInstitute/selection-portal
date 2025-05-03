@@ -47,7 +47,7 @@ const ExamCategoryRow = ({
       <TableCell>{examName}</TableCell>
       <TableCell>
         <Button onClick={deleteCategoryHandler} type="button" size="icon">
-          {deletingCategory.loader || <Trash2 />}
+          {deletingCategory.loader || <Trash2 className="text-red-400" />}
         </Button>
       </TableCell>
     </TableRow>

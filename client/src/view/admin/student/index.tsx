@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
 import { AxiosError } from "axios";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { z } from "zod";
@@ -15,22 +15,13 @@ import StudentTable from "./student-table";
 
 import Header from "./header";
 import { useLoading } from "@/hooks/use-loading";
-import { useSearchParams } from "next/navigation";
-
-// export const STUDENTS_PER_PAGE = 5;
 
 export type StudentSearch = { [key: string]: string };
 
 export default function AdminStudentsPage() {
-  const searchParams = useSearchParams();
-
-  const searchTimeout = useRef<NodeJS.Timeout>(null);
-
   const [showAddBoardForm, setShowAddBoardForm] = useState(false);
   const [editData, setEditData] = useState<null | Student>(null);
-  const [selectedExamId, setSelectedExamId] = useState<string | null>(
-    searchParams.get("examId")
-  );
+
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(-1);
   const [studentsPerPage, setStudentsPerPage] = useState(25);
@@ -54,21 +45,19 @@ export default function AdminStudentsPage() {
     },
   });
 
-  const fetchStudents = async (
-    skip: number,
-    examId: string | null,
-    search?: StudentSearch
-  ) => {
+  const fetchStudents = async (skip: number, search?: StudentSearch) => {
+    console.log("Trying to fetch Students");
     if (fetchingStudents.loading) return;
+    console.log("Fetching Students");
     try {
       const { data } = await apiClient.get("/api/student", {
         params: {
-          ...(examId ? { examId } : {}),
           ...search,
           skip,
           take: studentsPerPage,
         },
       });
+      console.log({ data: data.data });
       if (skip === 0) setStudents(data.data);
       else setStudents((prev) => [...prev, ...data.data]);
       setTotal(data.total);
@@ -85,8 +74,10 @@ export default function AdminStudentsPage() {
   };
 
   useEffect(() => {
-    triggerRefetchStudents();
-  }, [selectedExamId, search]);
+    return () => {
+      triggerRefetchStudents();
+    };
+  }, [search]);
 
   useEffect(() => {
     if (
@@ -95,20 +86,10 @@ export default function AdminStudentsPage() {
       isAuthenticated
     ) {
       fetchingStudents.asyncWrapper(() =>
-        fetchStudents(students.length, selectedExamId, search)
+        fetchStudents(students.length, search)
       );
     }
   }, [currentPage, total, studentsPerPage, isAuthenticated]);
-
-  const searchHandler = (key: string, value: string) => {
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    searchTimeout.current = setTimeout(() => {
-      setSearch((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-    }, 500);
-  };
 
   const toggleAddBoardForm = () => setShowAddBoardForm((prev) => !prev);
 
@@ -122,6 +103,7 @@ export default function AdminStudentsPage() {
     );
   }
 
+  console.log({ students });
   return (
     <div>
       <Header

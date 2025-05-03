@@ -77,7 +77,7 @@ const ExamRow = ({
               >
                 Delete
                 <MenubarShortcut>
-                  <Trash2 />
+                  <Trash2 className="text-red-400" />
                 </MenubarShortcut>
               </MenubarItem>
             </MenubarContent>

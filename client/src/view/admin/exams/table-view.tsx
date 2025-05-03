@@ -70,7 +70,7 @@ const ExamRow = ({
           }}
           size="icon"
         >
-          <Trash2 />
+          <Trash2 className="text-red-400" />
         </Button>
       </TableCell>
     </TableRow>

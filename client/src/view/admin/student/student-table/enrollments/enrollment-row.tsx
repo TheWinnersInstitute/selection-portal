@@ -70,11 +70,7 @@ export default function EnrollmentRow({
         {enrollment.post && enrollment.post.length > 15 ? (
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
-                <TooltipTrigger>
-                  {enrollment.post.slice(0, 15)}...
-                </TooltipTrigger>
-              </TooltipTrigger>
+              <TooltipTrigger>{enrollment.post.slice(0, 15)}...</TooltipTrigger>
               <TooltipContent>
                 <p>{enrollment.post}</p>
               </TooltipContent>
@@ -103,7 +99,7 @@ export default function EnrollmentRow({
             onClick={deleteConfirmationModel.toggleModel}
             size="icon"
           >
-            {deleting.loader || <Trash2 />}
+            {deleting.loader || <Trash2 className="text-red-400" />}
           </Button>
           {deleteConfirmationModel.content(
             <div className="flex justify-end items-center gap-2">

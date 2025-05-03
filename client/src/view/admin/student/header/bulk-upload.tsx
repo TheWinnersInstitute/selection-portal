@@ -168,10 +168,12 @@ export default function BulkUpload({
       {studentsListToDelete.length > 0 && (
         <>
           <Button
+            variant="destructive"
             className="fixed bottom-10 right-10 z-50"
             onClick={deleteStudentsModel.toggleModel}
           >
-            <Trash2 /> {studentsListToDelete.length} students
+            <Trash2 className="text-red-400" /> {studentsListToDelete.length}{" "}
+            students
           </Button>
 
           {deleteStudentsModel.content(

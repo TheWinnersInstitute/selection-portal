@@ -121,15 +121,16 @@ export default function StudentTableRow({
         >
           <Pen />
         </Button>
+
+        <Button variant="outline" onClick={downloadStudentPdf} size="icon">
+          {downloadingPdf.loader || <Download />}
+        </Button>
         <Button
           variant="outline"
           onClick={deleteConfirmationModel.toggleModel}
           size="icon"
         >
-          <Trash2 />
-        </Button>
-        <Button variant="outline" onClick={downloadStudentPdf} size="icon">
-          {downloadingPdf.loader || <Download />}
+          <Trash2 className="text-red-400" />
         </Button>
       </TableCell>
       {deleteConfirmationModel.content(

@@ -78,7 +78,7 @@ export default function RolesTable({
                   <Pen />
                 </Button>
                 <Button onClick={() => deleteHandler(role.id)} size="icon">
-                  {deletingRole.loader || <Trash2 />}
+                  {deletingRole.loader || <Trash2 className="text-red-400" />}
                 </Button>
               </TableCell>
             </TableRow>

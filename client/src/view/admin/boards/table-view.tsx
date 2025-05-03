@@ -68,7 +68,7 @@ const BoardRow = ({
           }}
           size="icon"
         >
-          {deleting.loader || <Trash2 />}
+          {deleting.loader || <Trash2 className="text-red-400" />}
         </Button>
       </TableCell>
     </TableRow>
