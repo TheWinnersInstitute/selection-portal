@@ -244,6 +244,15 @@ export default function EnrollmentForm({
                     maxLength={4}
                     placeholder="Enrollment year"
                     {...field}
+                    onChange={(e) => {
+                      field.onChange({
+                        ...e,
+                        target: {
+                          ...e.target,
+                          value: parseInt(e.target.value),
+                        },
+                      });
+                    }}
                   />
                 </FormControl>
                 <FormMessage />

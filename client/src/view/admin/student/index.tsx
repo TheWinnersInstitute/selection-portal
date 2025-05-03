@@ -19,7 +19,7 @@ import { useSearchParams } from "next/navigation";
 
 // export const STUDENTS_PER_PAGE = 5;
 
-type Search = { [key: string]: string };
+export type StudentSearch = { [key: string]: string };
 
 export default function AdminStudentsPage() {
   const searchParams = useSearchParams();
@@ -34,7 +34,7 @@ export default function AdminStudentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(-1);
   const [studentsPerPage, setStudentsPerPage] = useState(25);
-  const [search, setSearch] = useState<Search>({});
+  const [search, setSearch] = useState<StudentSearch>({});
   const [studentsToDelete, setStudentsToDelete] = useState<BooleanMap>({});
 
   const { apiClient, isAuthenticated } = useAuth();
@@ -50,7 +50,6 @@ export default function AdminStudentsPage() {
       name: "",
       contactNumber: "",
       fatherName: "",
-      // postAllotment: "",
       state: "Madhya Pradesh",
     },
   });
@@ -58,7 +57,7 @@ export default function AdminStudentsPage() {
   const fetchStudents = async (
     skip: number,
     examId: string | null,
-    search?: Search
+    search?: StudentSearch
   ) => {
     if (fetchingStudents.loading) return;
     try {
@@ -133,8 +132,9 @@ export default function AdminStudentsPage() {
         toggleAddBoardForm={toggleAddBoardForm}
         editData={editData}
         showAddBoardForm={showAddBoardForm}
-        setSelectedExamId={setSelectedExamId}
-        searchHandler={searchHandler}
+        // setSelectedExamId={setSelectedExamId}
+        search={search}
+        setSearch={setSearch}
       />
       <StudentTable
         studentsToDelete={studentsToDelete}

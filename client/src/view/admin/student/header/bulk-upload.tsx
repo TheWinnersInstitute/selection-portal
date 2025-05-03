@@ -20,16 +20,12 @@ export default function BulkUpload({
 }: Props) {
   const firstRender = useRef(true);
   const bulkUploadInputRef = useRef<HTMLInputElement>(null);
-  // const [total, setTotal] = useState(0);
   const [underProcess, setUnderProcess] = useState(0);
   const [pooling, setPooling] = useState(true);
   const { apiClient, isAuthenticated } = useAuth();
   const { setStudents } = useData();
 
-  const downloadingStudentData = useLoading();
   const uploadingFile = useLoading();
-  const downloadingPdf = useLoading();
-  // const downloadingErroredData = useLoading();
   const deleting = useLoading();
 
   const deleteStudentsModel = useModel(
