@@ -14,6 +14,10 @@ export * from "./update";
 export * from "./create-many";
 export * from "./download-errored";
 
+export * from "./assets/create";
+export * from "./assets/get";
+export * from "./assets/delete";
+
 export const studentInclude = {
   Enrollment: {
     include: {

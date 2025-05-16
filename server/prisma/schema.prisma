@@ -21,6 +21,7 @@ model User {
   exams     Exam[]
   Session   Session[]
   roleId    String?
+  Asset     Asset[]
 
   @@map("users")
 }
@@ -101,6 +102,7 @@ model Student {
   updatedAt  DateTime     @updatedAt
   imageId    String?
   Enrollment Enrollment[]
+  Asset      Asset[]
 
   @@unique([name, contactNumber])
   @@map("students")
@@ -132,12 +134,30 @@ model Enrollment {
   @@map("enrollments")
 }
 
+// model Gallery {
+//   id        String   @id @default(uuid())
+//   name      String
+//   path      String
+//   user      User     @relation(fields: [userId], references: [id])
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   userId    String
+
+//   @@map("gallery")
+// }
+
 model Asset {
   id            String       @id @default(uuid())
   path          String
   type          String
   studentImage  Student[]    @relation("student_image")
   studentResult Enrollment[] @relation("student_result")
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  student   Student? @relation(fields: [studentId], references: [id])
+  studentId String?
 
   @@map("assets")
 }

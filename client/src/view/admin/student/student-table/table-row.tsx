@@ -18,10 +18,18 @@ import { useData } from "@/context/DataContext";
 import { AxiosError } from "axios";
 import { format } from "date-fns";
 import EnrollmentsList from "./enrollments/enrollments-list";
-import { Download, Pen, Trash2 } from "lucide-react";
+import {
+  Download,
+  GalleryHorizontal,
+  GalleryThumbnails,
+  Image,
+  Pen,
+  Trash2,
+} from "lucide-react";
 import { studentPdf } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useModel } from "@/hooks/use-model";
+import Gallery from "./galley";
 
 type Props = {
   student: Student;
@@ -50,6 +58,8 @@ export default function StudentTableRow({
   const deleteConfirmationModel = useModel(
     "Are you sure you want to delete this student ??"
   );
+
+  const galleryModel = useModel("Student gallery");
 
   const deleteHandler = (id: string) => {
     deletingStudent.asyncWrapper(async () => {
@@ -127,6 +137,13 @@ export default function StudentTableRow({
         </Button>
         <Button
           variant="outline"
+          onClick={galleryModel.toggleModel}
+          size="icon"
+        >
+          <Image />
+        </Button>
+        <Button
+          variant="outline"
           onClick={deleteConfirmationModel.toggleModel}
           size="icon"
         >
@@ -150,6 +167,14 @@ export default function StudentTableRow({
             {deletingStudent.loader || "Delete"}
           </Button>
         </div>
+      )}
+
+      {galleryModel.content(
+        <Gallery
+          currentStudent={student}
+          toggle={galleryModel.toggleModel}
+          open={galleryModel.open}
+        />
       )}
     </TableRow>
   );

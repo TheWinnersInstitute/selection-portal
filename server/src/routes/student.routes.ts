@@ -7,6 +7,9 @@ import {
   updateStudent,
   downloadErroredData,
   queueStatus,
+  getStudentAssets,
+  createStudentAsset,
+  deleteStudentAsset,
 } from "../controllers/student";
 import { checkReturnPayload, checkAccess, checkAuth } from "../middleware";
 import { z } from "zod";
@@ -151,4 +154,41 @@ studentRoutes.delete(
     "params"
   ),
   deleteEnrollment
+);
+
+studentRoutes.get(
+  "/assets/:id",
+  checkAuth,
+  checkAccess("student", "read"),
+  checkReturnPayload(
+    z.object({
+      id: z.string(),
+    }),
+    "params"
+  ),
+  getStudentAssets
+);
+studentRoutes.post(
+  "/assets",
+  checkAuth,
+  checkAccess("student", "create"),
+  S3.instance.uploadFile.array("files", 10),
+  checkReturnPayload(
+    z.object({
+      userId: z.string(),
+    })
+  ),
+  createStudentAsset
+);
+studentRoutes.delete(
+  "/assets/:id",
+  checkAuth,
+  checkAccess("student", "delete"),
+  checkReturnPayload(
+    z.object({
+      id: z.string(),
+    }),
+    "params"
+  ),
+  deleteStudentAsset
 );

@@ -76,3 +76,9 @@ type User = {
 };
 
 type BooleanMap = { [key: string]: boolean };
+
+type Asset = {
+  id: string;
+  path: string;
+  type: string;
+};

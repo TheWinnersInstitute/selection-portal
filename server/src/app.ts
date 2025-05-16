@@ -8,6 +8,7 @@ import cors from "cors";
 import { authRoutes, boardRoutes, examRoutes, studentRoutes } from "./routes";
 import { RedisClient, S3, seed } from "./lib";
 import { adminRoutes } from "./routes/admin.routes";
+import { userRoutes } from "./routes/user.routes";
 
 async function main() {
   const PORT = process.env.PORT;
@@ -32,6 +33,7 @@ async function main() {
   app.use("/api/board", boardRoutes);
   app.use("/api/exam", examRoutes);
   app.use("/api/student", studentRoutes);
+  app.use("/api/user", userRoutes);
 
   S3.instance.backup();
 

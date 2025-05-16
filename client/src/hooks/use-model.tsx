@@ -58,5 +58,5 @@ export function useModel(title: string) {
     [content]
   );
 
-  return { content, toggleModel, confirmationModel };
+  return { content, toggleModel, open, confirmationModel };
 }

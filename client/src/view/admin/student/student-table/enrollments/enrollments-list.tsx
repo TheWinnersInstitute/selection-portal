@@ -28,12 +28,12 @@ export default function EnrollmentsList({
         {showDetails && (
           <TableHeader>
             <TableRow>
-              <TableHead>Post</TableHead>
+              <TableHead>Roll number</TableHead>
               <TableHead>Rank</TableHead>
               <TableHead>Selection in</TableHead>
               <TableHead>Exam</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Roll number</TableHead>
+              <TableHead>Post</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>

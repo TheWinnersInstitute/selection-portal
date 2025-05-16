@@ -1,16 +1,10 @@
 import { cn, fileToBase64 } from "@/lib/utils";
-import React, {
-  InputHTMLAttributes,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { InputHTMLAttributes, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
-import { set } from "lodash";
 import Image from "next/image";
+import { Upload } from "lucide-react";
 
 const mainVariant = {
   initial: {
@@ -98,12 +92,19 @@ export const FileUpload = ({
           className="hidden"
           accept={accept}
         />
-        <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
+        {/* <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
           <GridPattern />
-        </div>
+        </div> */}
         <div className="flex flex-col items-center justify-center">
-          {(multiple || files.length === 0) && (
+          {files.length === 0 && (
             <>
+              {!files.length && (
+                <Upload
+                  className="relative z-20 font-sans font-bold text-neutral-700 dark:text-neutral-300 text-base mb-2"
+                  // className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-10 text-neutral-600 dark:text-neutral-300"
+                  size={40}
+                />
+              )}
               <p className="relative z-20 font-sans font-bold text-neutral-700 dark:text-neutral-300 text-base">
                 {title || "Upload file"}
               </p>
@@ -176,7 +177,8 @@ export const FileUpload = ({
                   </motion.div>
                 )
               )}
-            {!files.length && (
+
+            {/* {!files.length && (
               <motion.div
                 layoutId="file-upload"
                 variants={mainVariant}
@@ -203,14 +205,14 @@ export const FileUpload = ({
                   <IconUpload className="h-4 w-4 text-neutral-600 dark:text-neutral-300" />
                 )}
               </motion.div>
-            )}
+            )} */}
 
-            {!files.length && (
+            {/* {!files.length && (
               <motion.div
                 variants={secondaryVariant}
                 className="absolute opacity-0 border border-dashed border-sky-400 inset-0 z-30 bg-transparent flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-md"
               ></motion.div>
-            )}
+            )} */}
           </div>
         </div>
       </motion.div>

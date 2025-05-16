@@ -67,6 +67,22 @@ export default function EnrollmentRow({
           }
         }}
       >
+        {enrollment.rollNumber}
+      </TableCell>
+      <TableCell className="w-[5vw]">
+        {/* @ts-ignore */}
+        {enrollment.rank || "-"}
+      </TableCell>
+      {showDetails && (
+        <TableCell className="w-20">{enrollment.selectionIn || "-"}</TableCell>
+      )}
+
+      {/* )} */}
+      <TableCell className="w-[10vw]">
+        {enrollment.exam.name.slice(0, 15)}
+      </TableCell>
+      <TableCell>{enrollment.examCategory?.name || "-"}</TableCell>
+      <TableCell>
         {enrollment.post && enrollment.post.length > 15 ? (
           <TooltipProvider>
             <Tooltip>
@@ -80,18 +96,7 @@ export default function EnrollmentRow({
           enrollment.post || "-"
         )}
       </TableCell>
-      <TableCell className="w-[5vw]">
-        {/* @ts-ignore */}
-        {enrollment.rank || "-"}
-      </TableCell>
-      {showDetails && (
-        <TableCell className="w-20">{enrollment.selectionIn || "-"}</TableCell>
-      )}
 
-      {/* )} */}
-      <TableCell>{enrollment.exam.name.slice(0, 15)}</TableCell>
-      <TableCell>{enrollment.examCategory?.name || "-"}</TableCell>
-      <TableCell>{enrollment.rollNumber}</TableCell>
       {showDetails && (
         <TableCell>
           <Button
