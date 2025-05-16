@@ -38,17 +38,27 @@ const Asset = ({ asset, onDelete }: { asset: Asset; onDelete: () => void }) => {
     });
   };
 
+  const isVideo = asset.type.startsWith("video");
+
   return (
     <div key={asset.id} className="w-auto h-48 relative">
       <Link
         href={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`}
         target="_blank"
       >
-        <img
-          src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`}
-          alt={asset.id}
-          className="w-auto h-48"
-        />
+        {isVideo ? (
+          <video
+            src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`}
+            className="w-auto h-48"
+            controls
+          />
+        ) : (
+          <img
+            src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`}
+            alt={asset.id}
+            className="w-auto h-48"
+          />
+        )}
       </Link>
       <div
         className="flex gap-2 items-center absolute top-0 right-0"
