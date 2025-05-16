@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/hooks/use-loading";
-import { Download, X } from "lucide-react";
+import { Download, FileText, X } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -9,6 +9,8 @@ const Asset = ({ asset, onDelete }: { asset: Asset; onDelete: () => void }) => {
   const { apiClient } = useAuth();
   const deleting = useLoading();
   const downloading = useLoading();
+
+  const fileUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`;
 
   const deleteFromGalleryHandler = () => {
     deleting.asyncWrapper(async () => {
@@ -19,10 +21,7 @@ const Asset = ({ asset, onDelete }: { asset: Asset; onDelete: () => void }) => {
 
   const downloadHandler = () => {
     downloading.asyncWrapper(async () => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`,
-        { mode: "cors" }
-      );
+      const response = await fetch(fileUrl, { mode: "cors" });
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
 
@@ -38,27 +37,41 @@ const Asset = ({ asset, onDelete }: { asset: Asset; onDelete: () => void }) => {
     });
   };
 
-  const isVideo = asset.type.startsWith("video");
+  const renderPreview = () => {
+    if (asset.type.startsWith("image/")) {
+      return (
+        <img
+          src={fileUrl}
+          alt={asset.id}
+          className="w-auto h-48 object-contain"
+        />
+      );
+    } else if (asset.type.startsWith("video/")) {
+      return (
+        <video
+          src={fileUrl}
+          controls
+          className="w-auto h-48 object-contain bg-black"
+        />
+      );
+    } else if (asset.type === "application/pdf") {
+      return (
+        <embed src={fileUrl} type="application/pdf" className="w-auto h-48" />
+      );
+    } else {
+      return (
+        <div className="flex items-center justify-center w-48 h-48 border bg-gray-50 text-sm text-gray-600">
+          <FileText className="w-6 h-6 mr-2" />
+          <span>{asset.path.split("/").at(-1)}</span>
+        </div>
+      );
+    }
+  };
 
   return (
     <div key={asset.id} className="w-auto h-48 relative">
-      <Link
-        href={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`}
-        target="_blank"
-      >
-        {isVideo ? (
-          <video
-            src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`}
-            className="w-auto h-48"
-            controls
-          />
-        ) : (
-          <img
-            src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${asset.id}`}
-            alt={asset.id}
-            className="w-auto h-48"
-          />
-        )}
+      <Link href={fileUrl} target="_blank">
+        {renderPreview()}
       </Link>
       <div
         className="flex gap-2 items-center absolute top-0 right-0"
