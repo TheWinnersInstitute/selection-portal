@@ -55,24 +55,29 @@ export default function Gallery({ open, currentStudent, toggle }: Props) {
   return (
     <>
       <div className="flex flex-wrap gap-2">
-        {fetchingGallery.loader ||
-          (currentStudent?.id &&
-            gallery[currentStudent.id]?.map((asset) => (
-              <Asset
-                onDelete={() => {
-                  setGallery((prev) => {
-                    return {
-                      ...prev,
-                      [currentStudent.id]: prev[currentStudent.id].filter(
-                        (a) => a.id !== asset.id
-                      ),
-                    };
-                  });
-                }}
-                asset={asset}
-                key={asset.id}
-              />
-            )))}
+        {fetchingGallery.loader && (
+          <div className="flex justify-center py-3">
+            {fetchingGallery.loader}
+          </div>
+        )}
+        {!fetchingGallery.loading &&
+          currentStudent?.id &&
+          gallery[currentStudent.id]?.map((asset) => (
+            <Asset
+              onDelete={() => {
+                setGallery((prev) => {
+                  return {
+                    ...prev,
+                    [currentStudent.id]: prev[currentStudent.id].filter(
+                      (a) => a.id !== asset.id
+                    ),
+                  };
+                });
+              }}
+              asset={asset}
+              key={asset.id}
+            />
+          ))}
       </div>
       <FileUpload multiple showPreview onChange={setFiles} />
       {files.length > 0 && (

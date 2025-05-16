@@ -1,6 +1,6 @@
 "use client";
 
-import AdminStudentsPage from "@/view/admin/student";
+import AdminStudentsPage from "@/view/admin/students";
 import React, { Suspense } from "react";
 
 export default function ServerAdminStudentsPage() {

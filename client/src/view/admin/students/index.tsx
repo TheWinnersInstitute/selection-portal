@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { studentFormSchema } from "./header/student-form";
-import StudentTable from "./student-table";
+import StudentsTable from "./students-table";
 
 import Header from "./header";
 import { useLoading } from "@/hooks/use-loading";
@@ -118,7 +118,7 @@ export default function AdminStudentsPage() {
         search={search}
         setSearch={setSearch}
       />
-      <StudentTable
+      <StudentsTable
         studentsToDelete={studentsToDelete}
         setStudentsToDelete={setStudentsToDelete}
         editHandler={(student) => {

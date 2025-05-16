@@ -49,6 +49,6 @@ jobs:
             npx tsc -b
             pm2 restart winnners-selection-portal-backend
             cd ../client
-            npm install
+            npm install --legacy-peer-deps
             npm run build
             pm2 restart winnners-selection-portal-frontend
