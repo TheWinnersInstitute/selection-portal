@@ -54,12 +54,12 @@ export default function Gallery({ open, currentStudent, toggle }: Props) {
 
   return (
     <>
+      {fetchingGallery.loader && (
+        <div className="flex-1 flex justify-center py-3">
+          {fetchingGallery.loader}
+        </div>
+      )}
       <div className="flex flex-wrap gap-2">
-        {fetchingGallery.loader && (
-          <div className="flex justify-center py-3">
-            {fetchingGallery.loader}
-          </div>
-        )}
         {!fetchingGallery.loading &&
           currentStudent?.id &&
           gallery[currentStudent.id]?.map((asset) => (
