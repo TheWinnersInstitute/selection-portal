@@ -2,13 +2,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import { CronJob } from "cron";
 import cors from "cors";
+import morgan from "morgan";
 
 import { authRoutes, boardRoutes, examRoutes, studentRoutes } from "./routes";
 import { RedisClient, S3, seed } from "./lib";
 import { adminRoutes } from "./routes/admin.routes";
 import { userRoutes } from "./routes/user.routes";
+import { luckyDrawRoutes } from "./routes/lucky-draw.routes";
 
 async function main() {
   const PORT = process.env.PORT;
@@ -23,6 +24,13 @@ async function main() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+  // var accessLogStream = fs.createWriteStream(
+  //   path.join(__dirname, "access.log"),
+  //   { flags: "a" }
+  // );
+
+  app.use(morgan("dev"));
+
   app.use((req, res, next) => {
     req.setTimeout(600000);
     next();
@@ -34,6 +42,7 @@ async function main() {
   app.use("/api/exam", examRoutes);
   app.use("/api/student", studentRoutes);
   app.use("/api/user", userRoutes);
+  app.use("/api/lucky-draw", luckyDrawRoutes);
 
   S3.instance.backup();
 

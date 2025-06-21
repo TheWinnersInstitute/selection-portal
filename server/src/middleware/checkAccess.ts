@@ -1,6 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 
-type Model = "exam" | "enrollment" | "board" | "student" | "user" | "role";
+type Model =
+  | "exam"
+  | "enrollment"
+  | "board"
+  | "student"
+  | "user"
+  | "role"
+  | "luckyDraw";
 type Action = "read" | "create" | "update" | "delete";
 
 export function checkAccess(mode: Model, action: Action) {

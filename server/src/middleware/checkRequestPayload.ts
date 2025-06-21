@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 
-export function checkReturnPayload(
+export function checkRequestPayload(
   requestBodySchema: z.ZodObject<any>,
   check: "body" | "query" | "params" = "body"
 ) {

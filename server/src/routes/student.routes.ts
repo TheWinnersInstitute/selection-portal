@@ -11,7 +11,7 @@ import {
   createStudentAsset,
   deleteStudentAsset,
 } from "../controllers/student";
-import { checkReturnPayload, checkAccess, checkAuth } from "../middleware";
+import { checkRequestPayload, checkAccess, checkAuth } from "../middleware";
 import { z } from "zod";
 import { S3, studentBulkUpload } from "../lib/s3";
 import { downloadStudentsExcel } from "../controllers/student/download";
@@ -25,7 +25,7 @@ studentRoutes.get(
   "/",
   checkAuth,
   checkAccess("student", "read"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       skip: z.string().max(5).optional(),
       take: z.string().max(5).optional(),
@@ -42,7 +42,7 @@ studentRoutes.post(
   checkAuth,
   checkAccess("student", "create"),
   S3.instance.uploadFile.single("file"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       name: z.string().max(100).min(1),
       email: z.string().optional(),
@@ -61,7 +61,7 @@ studentRoutes.delete(
   "/:id",
   checkAuth,
   checkAccess("student", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string().uuid(),
     }),
@@ -75,7 +75,7 @@ studentRoutes.patch(
   checkAuth,
   checkAccess("student", "update"),
   S3.instance.uploadFile.single("file"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string().uuid(),
       name: z.string().max(100).min(1),
@@ -123,7 +123,7 @@ studentRoutes.post(
   checkAuth,
   checkAccess("enrollment", "create"),
   S3.instance.uploadResult.single("file"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       studentId: z.string({ message: "Student is required" }).uuid(),
       post: z.string({ message: "Post is required" }).max(100).min(1),
@@ -147,7 +147,7 @@ studentRoutes.delete(
   "/enrollment/:id",
   checkAuth,
   checkAccess("enrollment", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string().uuid(),
     }),
@@ -160,7 +160,7 @@ studentRoutes.get(
   "/assets/:id",
   checkAuth,
   checkAccess("student", "read"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string(),
     }),
@@ -173,7 +173,7 @@ studentRoutes.post(
   checkAuth,
   checkAccess("student", "create"),
   S3.instance.uploadFile.array("files", 10),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       userId: z.string(),
     })
@@ -184,7 +184,7 @@ studentRoutes.delete(
   "/assets/:id",
   checkAuth,
   checkAccess("student", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string(),
     }),

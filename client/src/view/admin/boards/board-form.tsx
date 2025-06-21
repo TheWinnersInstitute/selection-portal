@@ -131,6 +131,6 @@ type Props = {
   editData: null | Board;
   showBoardForm: boolean;
   toggleBoardForm: () => void;
-  form: UseFormReturn<z.infer<typeof BoardFormSchema>, any, undefined>;
+  form: UseFormReturn<z.infer<typeof BoardFormSchema>>;
   setEditData: (data: null | Board) => void;
 };

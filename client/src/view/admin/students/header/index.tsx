@@ -66,7 +66,7 @@ type Props = {
   toggleAddBoardForm: () => void;
   editData: Student | null;
   setEditData: React.Dispatch<React.SetStateAction<Student | null>>;
-  form: UseFormReturn<StudentFormValues, any, undefined>;
+  form: UseFormReturn<StudentFormValues, any, StudentFormValues>;
   triggerRefetchStudents: () => void;
   setSearch: React.Dispatch<React.SetStateAction<StudentSearch>>;
   studentsToDelete: BooleanMap;

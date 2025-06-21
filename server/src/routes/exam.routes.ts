@@ -5,7 +5,7 @@ import {
   getExams,
   updateExam,
 } from "../controllers/exam";
-import { checkReturnPayload, checkAccess, checkAuth } from "../middleware";
+import { checkRequestPayload, checkAccess, checkAuth } from "../middleware";
 import { z } from "zod";
 import {
   createExamCategory,
@@ -19,7 +19,7 @@ examRoutes.post(
   "/",
   checkAuth,
   checkAccess("exam", "create"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       name: z.string().max(100).min(1),
       description: z.string().max(1000).optional(),
@@ -33,7 +33,7 @@ examRoutes.delete(
   "/:id",
   checkAuth,
   checkAccess("exam", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string().uuid(),
     }),
@@ -46,7 +46,7 @@ examRoutes.patch(
   "/",
   checkAuth,
   checkAccess("exam", "update"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string().uuid(),
       name: z.string().max(100).min(1),
@@ -62,7 +62,7 @@ examRoutes.post(
   "/category",
   checkAuth,
   checkAccess("exam", "create"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       name: z.string().max(100).min(1),
       examId: z.string().uuid(),
@@ -75,7 +75,7 @@ examRoutes.delete(
   "/category/:id",
   checkAuth,
   checkAccess("exam", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string().uuid(),
     }),

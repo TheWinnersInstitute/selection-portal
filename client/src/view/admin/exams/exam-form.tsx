@@ -211,6 +211,10 @@ type Props = {
   showAddBoardForm: boolean;
   editData: null | Exam;
   setEditData: React.Dispatch<React.SetStateAction<null | Exam>>;
-  form: UseFormReturn<z.infer<typeof ExamFormSchema>, any, undefined>;
+  form: UseFormReturn<
+    z.infer<typeof ExamFormSchema>,
+    any,
+    z.infer<typeof ExamFormSchema>
+  >;
   toggleExamForm: () => void;
 };

@@ -5,7 +5,7 @@ import {
   getBoards,
   updateBoard,
 } from "../controllers/board";
-import { checkReturnPayload, checkAccess, checkAuth } from "../middleware";
+import { checkRequestPayload, checkAccess, checkAuth } from "../middleware";
 import { z } from "zod";
 
 export const boardRoutes = Router();
@@ -15,7 +15,7 @@ boardRoutes.post(
   "/",
   checkAuth,
   checkAccess("board", "create"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       name: z.string().max(100).min(1),
       description: z.string().max(1000).min(5),
@@ -27,7 +27,7 @@ boardRoutes.delete(
   "/:id",
   checkAuth,
   checkAccess("board", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string().max(100),
     }),
@@ -40,7 +40,7 @@ boardRoutes.patch(
   "/",
   checkAuth,
   checkAccess("board", "update"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string().max(100),
       name: z.string().max(100).min(1),

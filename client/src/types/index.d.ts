@@ -65,6 +65,35 @@ type Role = {
   student: Action[];
   user: Action[];
   role: Action[];
+  luckyDraw: Action[];
+};
+
+type LuckyDraw = {
+  id: string;
+  name: string;
+  openingDate: string;
+  participationEndDate: string;
+  bannerId?: string;
+  participantsCount?: number;
+};
+
+type LuckyDrawReward = {
+  name: string;
+  id: string;
+  luckyDrawId: string;
+  count: number;
+  assetId: string | null;
+};
+
+type LuckyDrawParticipant = {
+  id: string;
+  luckyDrawId: string;
+  name: string;
+  email: string;
+  phone: string;
+  isWinner: boolean;
+  profileId: string | null;
+  luckyDrawRewardId: string | null;
 };
 
 type Action = "read" | "create" | "update" | "delete";

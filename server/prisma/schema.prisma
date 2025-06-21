@@ -134,18 +134,6 @@ model Enrollment {
   @@map("enrollments")
 }
 
-// model Gallery {
-//   id        String   @id @default(uuid())
-//   name      String
-//   path      String
-//   user      User     @relation(fields: [userId], references: [id])
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   userId    String
-
-//   @@map("gallery")
-// }
-
 model Asset {
   id            String       @id @default(uuid())
   path          String
@@ -156,8 +144,11 @@ model Asset {
   user   User?   @relation(fields: [userId], references: [id])
   userId String?
 
-  student   Student? @relation(fields: [studentId], references: [id])
-  studentId String?
+  student              Student?               @relation(fields: [studentId], references: [id])
+  studentId            String?
+  LuckyDrawReward      LuckyDrawReward[]
+  LuckyDrawParticipant LuckyDrawParticipant[]
+  LuckyDraw            LuckyDraw[]
 
   @@map("assets")
 }
@@ -173,8 +164,63 @@ model Role {
   student    Action[]
   user       Action[]
   role       Action[]
+  luckyDraw  Action[]  @default([])
 
   @@map("roles")
+}
+
+model LuckyDraw {
+  id                   String          @id @default(uuid())
+  name                 String          @unique
+  status               LuckyDrawStatus @default(upcoming)
+  participationEndDate DateTime
+  openingDate          DateTime
+  bannerId             String?
+
+  banner               Asset?                 @relation(fields: [bannerId], references: [id])
+  LuckyDrawParticipant LuckyDrawParticipant[]
+  LuckyDrawReward      LuckyDrawReward[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("luckyDraw")
+}
+
+model LuckyDrawReward {
+  id                   String                 @id @default(uuid())
+  name                 String
+  count                Int
+  // waitingWinnersCount  Int
+  luckyDraw            LuckyDraw              @relation(fields: [luckyDrawId], references: [id])
+  luckyDrawId          String
+  asset                Asset?                 @relation(fields: [assetId], references: [id])
+  assetId              String?
+  LuckyDrawParticipant LuckyDrawParticipant[]
+
+  @@unique([name, luckyDrawId])
+  @@map("luckyDrawRewards")
+}
+
+model LuckyDrawParticipant {
+  id                String  @id @default(uuid())
+  name              String
+  email             String
+  phone             String
+  isWinner          Boolean @default(false)
+  luckyDrawId       String
+  profileId         String?
+  luckyDrawRewardId String?
+
+  reward    LuckyDrawReward? @relation(fields: [luckyDrawRewardId], references: [id])
+  luckyDraw LuckyDraw        @relation(fields: [luckyDrawId], references: [id])
+  profile   Asset?           @relation(fields: [profileId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([luckyDrawId, name, phone])
+  @@map("luckyDrawParticipants")
 }
 
 enum Action {
@@ -188,4 +234,9 @@ enum ExamStatus {
   pending
   ongoing
   ended
+}
+
+enum LuckyDrawStatus {
+  upcoming
+  completed
 }

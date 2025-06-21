@@ -27,26 +27,6 @@ import { StateAndCities } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { useLoading } from "@/hooks/use-loading";
 
-export const studentFormSchema = z.object({
-  name: z.string().max(100).min(1),
-  email: z.string().optional(),
-  city: z.string().max(100).optional(),
-  contactNumber: z.string().length(10),
-  year: z.string().optional(),
-  month: z.string().optional(),
-  date: z.string().optional(),
-  fatherName: z.string().max(100).optional(),
-  state: z.string().max(100).optional(),
-});
-
-export type StudentFormValues = z.infer<typeof studentFormSchema>;
-
-type Props = {
-  editData: Student | null;
-  toggleAddBoardForm: () => void;
-  form: UseFormReturn<StudentFormValues, any, undefined>;
-};
-
 export default function StudentForm({
   editData,
   toggleAddBoardForm,
@@ -351,3 +331,23 @@ export default function StudentForm({
     </>
   );
 }
+
+export const studentFormSchema = z.object({
+  name: z.string().max(100).min(1),
+  email: z.string().optional(),
+  city: z.string().max(100).optional(),
+  contactNumber: z.string().length(10),
+  year: z.string().optional(),
+  month: z.string().optional(),
+  date: z.string().optional(),
+  fatherName: z.string().max(100).optional(),
+  state: z.string().max(100).optional(),
+});
+
+export type StudentFormValues = z.infer<typeof studentFormSchema>;
+
+type Props = {
+  editData: Student | null;
+  toggleAddBoardForm: () => void;
+  form: UseFormReturn<StudentFormValues, any, StudentFormValues>;
+};

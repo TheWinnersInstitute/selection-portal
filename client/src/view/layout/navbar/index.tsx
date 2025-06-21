@@ -24,6 +24,7 @@ import {
   Book,
   BookUser,
   GraduationCap,
+  HandCoins,
   MonitorCogIcon,
   User,
   Users,
@@ -44,6 +45,11 @@ const items = [
     title: "Students",
     url: "/admin/student",
     icon: GraduationCap,
+  },
+  {
+    title: "Lucky draw",
+    url: "/admin/lucky-draw",
+    icon: HandCoins,
   },
   {
     title: "Roles",
@@ -89,7 +95,7 @@ export default function Navbar({ children }: PropsWithChildren) {
         <SidebarFooter />
       </Sidebar>
       <main className="w-[100vw]">
-        <nav className="w-full px-[5%] py-4 shadow-lg flex justify-between">
+        <nav className="w-full sticky bg-[#020618] top-0 py-4 px-[5%] shadow-none flex justify-between">
           <div className="flex items-center gap-2">
             {pathname.includes("/admin/") && <SidebarTrigger />}
             <h1 className="text-lg font-bold">Selection portal</h1>

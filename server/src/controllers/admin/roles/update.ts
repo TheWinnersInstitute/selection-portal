@@ -3,7 +3,17 @@ import { errorResponse, prisma } from "../../../lib";
 
 export async function updateRole(req: Request, res: Response) {
   try {
-    const { id, name, board, enrollment, exam, student, role, user } = req.body;
+    const {
+      id,
+      name,
+      board,
+      enrollment,
+      exam,
+      student,
+      role,
+      user,
+      luckyDraw,
+    } = req.body;
 
     const newRole = await prisma.role.update({
       where: {
@@ -17,6 +27,7 @@ export async function updateRole(req: Request, res: Response) {
         student,
         role,
         user,
+        luckyDraw,
       },
     });
     res.json({

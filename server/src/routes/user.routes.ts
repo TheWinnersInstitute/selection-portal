@@ -4,7 +4,7 @@ import {
   createUserAsset,
   deleteUserAsset,
 } from "../controllers/user";
-import { checkAccess, checkAuth, checkReturnPayload } from "../middleware";
+import { checkAccess, checkAuth, checkRequestPayload } from "../middleware";
 import { z } from "zod";
 import { S3 } from "../lib";
 
@@ -20,7 +20,7 @@ userRoutes.post(
   "/assets",
   checkAuth,
   checkAccess("user", "create"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       userId: z.string(),
     })
@@ -32,7 +32,7 @@ userRoutes.delete(
   "/assets/:id",
   checkAuth,
   checkAccess("user", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string(),
     }),

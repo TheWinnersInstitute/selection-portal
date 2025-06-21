@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { checkReturnPayload } from "../middleware/checkRequestPayload";
+import { checkRequestPayload } from "../middleware/checkRequestPayload";
 import { z } from "zod";
 import { adminLogin, getAsset, logout } from "../controllers/admin";
 import { checkAuth } from "../middleware/checkAuth";
@@ -22,7 +22,7 @@ import {
 export const adminRoutes = Router();
 adminRoutes.post(
   "/login",
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       email: z.string(),
       password: z.string(),
@@ -33,7 +33,7 @@ adminRoutes.post(
 
 adminRoutes.get(
   "/assets/:id",
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string(),
     }),
@@ -49,7 +49,7 @@ adminRoutes.post(
   "/user",
   checkAuth,
   checkAccess("user", "create"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       email: z.string(),
       password: z.string(),
@@ -62,7 +62,7 @@ adminRoutes.patch(
   "/user",
   checkAuth,
   checkAccess("user", "update"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string(),
       roleId: z.string(),
@@ -74,7 +74,7 @@ adminRoutes.delete(
   "/user/:id",
   checkAuth,
   checkAccess("user", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string(),
     }),
@@ -89,7 +89,7 @@ adminRoutes.post(
   "/role",
   checkAuth,
   checkAccess("role", "create"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       name: z.string(),
       board: z.array(z.enum(["read", "create", "update", "delete"])),
@@ -98,6 +98,7 @@ adminRoutes.post(
       student: z.array(z.enum(["read", "create", "update", "delete"])),
       role: z.array(z.enum(["read", "create", "update", "delete"])),
       user: z.array(z.enum(["read", "create", "update", "delete"])),
+      luckyDraw: z.array(z.enum(["read", "create", "update", "delete"])),
     })
   ),
   createRole
@@ -106,7 +107,7 @@ adminRoutes.patch(
   "/role",
   checkAuth,
   checkAccess("role", "update"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string(),
       name: z.string(),
@@ -116,6 +117,7 @@ adminRoutes.patch(
       student: z.array(z.enum(["read", "create", "update", "delete"])),
       role: z.array(z.enum(["read", "create", "update", "delete"])),
       user: z.array(z.enum(["read", "create", "update", "delete"])),
+      luckyDraw: z.array(z.enum(["read", "create", "update", "delete"])),
     })
   ),
   updateRole
@@ -125,7 +127,7 @@ adminRoutes.delete(
   "/role/:id",
   checkAuth,
   checkAccess("role", "delete"),
-  checkReturnPayload(
+  checkRequestPayload(
     z.object({
       id: z.string(),
     }),
