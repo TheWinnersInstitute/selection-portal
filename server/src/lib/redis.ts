@@ -13,6 +13,9 @@ export class RedisClient {
   public queueLength: number;
 
   private constructor() {
+    // this.redisClient = new IORedis(process.env.REDIS_URL as string, {
+    //   maxRetriesPerRequest: null,
+    // });
     this.redisClient = new IORedis({
       host: process.env.REDIS_HOST as string,
       password: process.env.REDIS_PASSWORD as string,
@@ -23,6 +26,12 @@ export class RedisClient {
     });
     this.worker();
     this.queueLength = 0;
+    this.queue.count().then((count) => {
+      this.queueLength = count;
+    });
+    this.redisClient.ping((e, result) => {
+      console.log(e, result);
+    });
   }
 
   public static get Instance() {
@@ -90,6 +99,7 @@ export class RedisClient {
               },
             });
           }
+          console.log(student);
           if (student && !student.imageId && photo) {
             profileId = await uploadDriveFileToS3(photo, "student-profiles");
             await prisma.student.update({
@@ -169,10 +179,19 @@ export class RedisClient {
       },
       {
         connection: this.redisClient,
+        // lockDuration: 30000,
       }
     );
     worker.on("completed", (job) => {
-      console.log(job.id, "Completed");
+      console.log(`✅ Completed job ${job.id}`);
+    });
+
+    worker.on("failed", (job, err) => {
+      console.error(`❌ Failed job ${job?.id}`, err);
+    });
+
+    worker.on("error", (err) => {
+      console.error("Worker error", err);
     });
   }
 }

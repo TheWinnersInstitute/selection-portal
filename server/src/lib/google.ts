@@ -45,8 +45,7 @@ export const uploadDriveFileToS3 = async (
 ): Promise<string> => {
   return new Promise(async (res, rej) => {
     try {
-      const _url = new URL(url);
-      const fileId = _url.searchParams.get("id");
+      const fileId = extractDriveFileId(url);
       if (fileId) {
         const { data: fileMeta } = await googleDrive.files.get({
           fileId,
@@ -86,6 +85,9 @@ export const uploadDriveFileToS3 = async (
         });
         dest.on("error", rej);
         response.data.pipe(dest);
+      } else {
+        console.log("Image not found");
+        rej("Image not found");
       }
     } catch (error) {
       console.log(error);
@@ -93,3 +95,13 @@ export const uploadDriveFileToS3 = async (
     }
   });
 };
+
+function extractDriveFileId(url: string) {
+  const _url = new URL(url);
+  let fileId = _url.searchParams.get("id");
+  if (!fileId) {
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+    fileId = match ? match[1] : null;
+  }
+  return fileId;
+}
