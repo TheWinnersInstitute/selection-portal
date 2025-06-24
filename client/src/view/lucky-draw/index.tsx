@@ -65,7 +65,7 @@ export default function PublicLuckyDrawPage({
       />
       <div className="px-[5%] mt-4">
         <div className="flex justify-between items-center">
-          <h1 className=" mb-2 md:mb-4 font-bold text-md md:text-xl lg:text-2xl">
+          <h1 className="mb-2 md:mb-4 font-bold text-md md:text-xl lg:text-2xl">
             {luckyDraw.name}{" "}
             {luckyDraw.participantsCount
               ? `(${luckyDraw.participantsCount})`

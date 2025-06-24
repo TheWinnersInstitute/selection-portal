@@ -101,7 +101,7 @@ luckyDrawRoutes.get(
   ),
   checkRequestPayload(
     z.object({
-      winners: z.string(),
+      winners: z.string().optional(),
     }),
     "query"
   ),

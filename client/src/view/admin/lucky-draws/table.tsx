@@ -8,7 +8,13 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { EllipsisVertical, ImageIcon, Pen, Trash2 } from "lucide-react";
+import {
+  EllipsisVertical,
+  ImageIcon,
+  ListStart,
+  Pen,
+  Trash2,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/hooks/use-loading";
 import { toast } from "sonner";
@@ -78,6 +84,17 @@ function LuckyDrawCard({
               <EllipsisVertical />
             </MenubarTrigger>
             <MenubarContent>
+              <MenubarItem
+                onClick={() => {
+                  router.push(`/${luckyDraw.id}`);
+                }}
+              >
+                Start
+                <MenubarShortcut>
+                  <ListStart />
+                </MenubarShortcut>
+              </MenubarItem>
+              <MenubarSeparator />
               <MenubarItem
                 onClick={() => {
                   setEditData(luckyDraw);

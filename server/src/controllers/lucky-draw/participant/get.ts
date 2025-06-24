@@ -11,7 +11,7 @@ export async function getLuckyDrawParticipants(
     const luckyDrawParticipants = await prisma.luckyDrawParticipant.findMany({
       where: {
         luckyDrawId,
-        isWinner: winners === "true",
+        isWinner: !!winners ? winners === "true" : undefined,
       },
     });
 

@@ -1,11 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -16,21 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { useAuth } from "@/context/AuthContext";
 import { useLoading } from "@/hooks/use-loading";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import ParticipantsTable from "./participants-table";
+import WinnersTable from "./winners-table";
+import { toast } from "sonner";
 
 export default function LuckyDrawExecution({
   luckyDraw,
@@ -58,10 +52,14 @@ export default function LuckyDrawExecution({
         );
         setWinners(null);
       } else {
+        if (!values.luckyDrawRewardId) {
+          toast("Please select reward", {});
+          return;
+        }
         const { data } = await apiClient.get(
           `/api/lucky-draw/${luckyDraw.id}/${values.luckyDrawRewardId}`,
           {
-            params: { count: values.count },
+            params: !!values.count ? { count: values.count } : {},
           }
         );
         setWinners(data.data);
@@ -71,15 +69,6 @@ export default function LuckyDrawExecution({
 
   return (
     <div className="relative h-screen w-screen">
-      <Image
-        alt={luckyDraw.id}
-        src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${luckyDraw.bannerId}`}
-        width={500}
-        height={500}
-        className="absolute top-0 left-0 right-0 bottom-0 w-screen h-auto object-cover opacity-30"
-        quality={100}
-        priority
-      />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
           <div className="absolute top-0 left-0 right-0 bottom-0 z-10 px-[5%] py-[2%]">
@@ -114,8 +103,8 @@ export default function LuckyDrawExecution({
                               defaultValue={field.value || ""}
                             >
                               <FormControl>
-                                <SelectTrigger className="w-full bg-primary">
-                                  <SelectValue placeholder="Select state" />
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select Reward" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -160,44 +149,30 @@ export default function LuckyDrawExecution({
                         </FormItem>
                       )}
                     />
+                    <Button type="submit">
+                      {submitting.loader || "Execute"}
+                    </Button>
                   </>
                 )}
               </div>
             </div>
-            {!winners && (
-              <div className="flex justify-center items-center h-[90vh]">
-                <Button type="submit">{submitting.loader || "Start"}</Button>
+            <div className="grid grid-cols-3 min-h-[90vh] gap-5">
+              <div className="col-span-2">
+                {!winners && luckyDraw.bannerId && (
+                  <Image
+                    alt={luckyDraw.id}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${luckyDraw.bannerId}`}
+                    width={500}
+                    height={500}
+                    className="w-full rounded-md"
+                    quality={100}
+                    priority
+                  />
+                )}
+                {winners && <WinnersTable winners={winners} />}
               </div>
-            )}
-
-            {winners && (
-              <Card>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>S.No.</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Mobile no.</TableHead>
-                        <TableHead>Email</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {winners.map((winner, index) => {
-                        return (
-                          <TableRow key={winner.id}>
-                            <TableCell>{index + 1}</TableCell>
-                            <TableCell>{winner.name}</TableCell>
-                            <TableCell>{winner.phone}</TableCell>
-                            <TableCell>{winner.email}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            )}
+              <ParticipantsTable />
+            </div>
           </div>
         </form>
       </Form>
