@@ -54,19 +54,17 @@ export async function startLuckyDraw(
       },
     });
 
-    console.log({ participantsCount });
     const randomIndexes = new Set<number>();
     while (randomIndexes.size < numberOfParticipantsToDraw) {
       randomIndexes.add(Math.floor(Math.random() * participantsCount));
     }
 
-    const winners = await Promise.all(
-      [...randomIndexes].map((offset) =>
-        prisma.luckyDrawParticipant.findFirst({
-          skip: offset,
-        })
-      )
-    );
+    const winners: LuckyDrawParticipant[] = await prisma.$queryRawUnsafe(`
+      SELECT * FROM "luckyDrawParticipants"
+      WHERE "luckyDrawId" = '${luckyDrawId}' AND "isWinner" = false
+      ORDER BY RANDOM()
+      LIMIT ${numberOfParticipantsToDraw};
+    `);
 
     res.status(200).json({
       message: "success",
