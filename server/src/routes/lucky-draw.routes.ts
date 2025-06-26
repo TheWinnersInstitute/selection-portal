@@ -16,13 +16,14 @@ import {
   getLuckyDrawParticipants,
   updateLuckyDrawParticipant,
 } from "../controllers/lucky-draw/participant";
-import { S3 } from "../lib";
+import { S3, studentBulkUpload } from "../lib";
 import {
   addLuckyDrawReward,
   deleteLuckyDrawReward,
   getLuckyDrawRewards,
   updateLuckyDrawReward,
 } from "../controllers/lucky-draw/reward";
+import { addLuckyDrawParticipants } from "../controllers/lucky-draw/participant/add-many";
 
 export const luckyDrawRoutes = Router();
 
@@ -102,6 +103,7 @@ luckyDrawRoutes.get(
   checkRequestPayload(
     z.object({
       winners: z.string().optional(),
+      cursor: z.string().uuid().optional(),
     }),
     "query"
   ),
@@ -111,7 +113,7 @@ luckyDrawRoutes.get(
 luckyDrawRoutes.delete(
   "/participant/:luckyDrawId/:id",
   checkAuth,
-  checkAccess("luckyDraw", "read"),
+  checkAccess("luckyDraw", "delete"),
   checkRequestPayload(
     z.object({
       luckyDrawId: z.string().uuid(),
@@ -140,6 +142,20 @@ luckyDrawRoutes.post(
     "body"
   ),
   addLuckyDrawParticipant
+);
+
+luckyDrawRoutes.post(
+  "/participants/:luckyDrawId",
+  checkAuth,
+  checkAccess("luckyDraw", "create"),
+  checkRequestPayload(
+    z.object({
+      luckyDrawId: z.string().uuid(),
+    }),
+    "params"
+  ),
+  studentBulkUpload.single("file"),
+  addLuckyDrawParticipants
 );
 
 luckyDrawRoutes.patch(

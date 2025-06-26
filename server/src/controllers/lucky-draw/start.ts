@@ -47,40 +47,40 @@ export async function startLuckyDraw(
       return;
     }
 
-    const participants = await prisma.luckyDrawParticipant.findMany({
+    const participantsCount = await prisma.luckyDrawParticipant.count({
       where: {
         luckyDrawId,
         isWinner: false,
       },
     });
 
-    if (participants.length < numberOfParticipantsToDraw) {
-      res.status(404).json({
-        message: `Sorry! we are short by ${
-          numberOfParticipantsToDraw - participants.length
-        } participants`,
-      });
-      return;
+    console.log({ participantsCount });
+    const randomIndexes = new Set<number>();
+    while (randomIndexes.size < numberOfParticipantsToDraw) {
+      randomIndexes.add(Math.floor(Math.random() * participantsCount));
     }
 
-    const winners: LuckyDrawParticipant[] = [];
+    const winners = await Promise.all(
+      [...randomIndexes].map((offset) =>
+        prisma.luckyDrawParticipant.findFirst({
+          skip: offset,
+        })
+      )
+    );
 
-    for (let i = 0; i < numberOfParticipantsToDraw; i++) {
-      const winnerIndex = findRandomBetween(0, participants.length - 1);
-      winners.push(participants[winnerIndex]);
-      participants.splice(winnerIndex, 1);
-    }
     res.status(200).json({
       message: "success",
-      data: winners.map((winner) => {
-        return {
-          id: winner.id,
-          name: winner.name,
-          email: winner.email,
-          phone: winner.phone,
-          profileId: winner.profileId,
-        };
-      }),
+      data: winners
+        .filter((w) => !!w)
+        .map((winner) => {
+          return {
+            id: winner.id,
+            name: winner.name,
+            email: winner.email,
+            phone: winner.phone,
+            profileId: winner.profileId,
+          };
+        }),
     });
   } catch (error) {
     if (error instanceof Error)

@@ -43,8 +43,8 @@ export default function WinnersTable({ winners }: Props) {
             >
               <p className="flex-1">{index + 1}</p>
               <p className="flex-2">{winner.name}</p>
-              <p className="flex-2">{winner.phone}</p>
-              <p className="flex-2">{winner.email}</p>
+              <p className="flex-2">{hideMobileNumber(winner.phone)}</p>
+              <p className="flex-2">{hideEmail(winner.email)}</p>
             </div>
           );
         })}
@@ -56,3 +56,22 @@ export default function WinnersTable({ winners }: Props) {
 type Props = {
   winners: LuckyDrawParticipant[];
 };
+
+function hideMobileNumber(number: string) {
+  if (number.length < 4) return number;
+
+  const start = number.slice(0, 2);
+  const end = number.slice(-2);
+  const masked = "*".repeat(number.length - 4);
+  return `${start}${masked}${end}`;
+}
+
+function hideEmail(email: string) {
+  const [local, domain] = email.split("@");
+  if (!local || !domain || local.length < 3) return email;
+
+  const start = local.slice(0, 2);
+  const end = local.slice(-1);
+  const masked = "*".repeat(local.length - 3);
+  return `${start}${masked}${end}@${domain}`;
+}
