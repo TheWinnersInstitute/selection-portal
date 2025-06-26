@@ -12,7 +12,9 @@ import {
 import { z } from "zod";
 import {
   addLuckyDrawParticipant,
+  addLuckyDrawParticipants,
   deleteLuckyDrawParticipant,
+  downloadLuckyDrawWinnersExcel,
   getLuckyDrawParticipants,
   updateLuckyDrawParticipant,
 } from "../controllers/lucky-draw/participant";
@@ -23,7 +25,6 @@ import {
   getLuckyDrawRewards,
   updateLuckyDrawReward,
 } from "../controllers/lucky-draw/reward";
-import { addLuckyDrawParticipants } from "../controllers/lucky-draw/participant/add-many";
 
 export const luckyDrawRoutes = Router();
 
@@ -156,6 +157,19 @@ luckyDrawRoutes.post(
   ),
   studentBulkUpload.single("file"),
   addLuckyDrawParticipants
+);
+
+luckyDrawRoutes.get(
+  "/participants/:luckyDrawId/download",
+  checkAuth,
+  checkAccess("luckyDraw", "read"),
+  checkRequestPayload(
+    z.object({
+      luckyDrawId: z.string().uuid(),
+    }),
+    "params"
+  ),
+  downloadLuckyDrawWinnersExcel
 );
 
 luckyDrawRoutes.patch(

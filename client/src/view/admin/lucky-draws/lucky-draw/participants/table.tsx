@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Menubar,
   MenubarContent,
@@ -34,6 +34,8 @@ function LuckyDrawParticipantRow({
   setLuckyDrawParticipants,
   toggleLuckyDrawParticipantForm,
   index,
+  winners,
+  luckyDrawRewardMap,
 }: RowProps) {
   const { apiClient } = useAuth();
   const params = useParams();
@@ -56,6 +58,11 @@ function LuckyDrawParticipantRow({
       <TableCell>{participant.name}</TableCell>
       <TableCell>{participant.phone}</TableCell>
       <TableCell>{participant.email}</TableCell>
+      {winners && participant.luckyDrawRewardId && (
+        <TableCell>
+          {luckyDrawRewardMap[participant.luckyDrawRewardId]?.name || ""}
+        </TableCell>
+      )}
       <TableCell onClick={(e) => e.stopPropagation()} className="space-x-1">
         <Menubar className="bg-transparent border-0 p-0">
           <MenubarMenu>
@@ -99,17 +106,41 @@ export default function LuckyDrawParticipantsTable({
   participants,
   setLuckyDrawParticipants,
   toggleLuckyDrawParticipantForm,
-}: Props) {
+  winners,
+}: // fetchPaticipants,
+Props) {
+  // const containerRef= useRef<HTMLDivElement>(null);
+  const params = useParams();
+  const fetchingLuckyDrawRewards = useLoading();
+  const { apiClient } = useAuth();
+
+  const [luckyDrawRewardMap, setLuckyDrawRewardMap] =
+    useState<LuckyDrawRewardMap>({});
+
+  useEffect(() => {
+    fetchingLuckyDrawRewards.asyncWrapper(async () => {
+      const { data } = await apiClient.get(
+        `/api/lucky-draw/reward/${params.luckyDrawId}`
+      );
+      setLuckyDrawRewardMap(
+        data.data.reduce((prev: LuckyDrawRewardMap, curr: LuckyDrawReward) => {
+          return { ...prev, [curr.id]: curr };
+        }, {} as LuckyDrawRewardMap)
+      );
+    });
+  }, []);
+
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 h-[75vh] overflow-y-auto relative">
       <Table>
         <TableCaption>A list of exams.</TableCaption>
-        <TableHeader>
+        <TableHeader className="sticky top-0">
           <TableRow>
             <TableHead>S.No.</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Email</TableHead>
+            {winners && <TableHead>Reward</TableHead>}
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -124,6 +155,8 @@ export default function LuckyDrawParticipantsTable({
               setEditData={setEditData}
               setLuckyDrawParticipants={setLuckyDrawParticipants}
               toggleLuckyDrawParticipantForm={toggleLuckyDrawParticipantForm}
+              winners={winners}
+              luckyDrawRewardMap={luckyDrawRewardMap}
             />
           ))}
         </TableBody>
@@ -138,6 +171,7 @@ type Props = {
     any,
     LuckyDrawParticipantFormType
   >;
+  winners?: boolean;
   setEditData: (data: LuckyDrawParticipant) => void;
   toggleLuckyDrawParticipantForm: () => void;
   participants: LuckyDrawParticipant[];
@@ -149,4 +183,9 @@ type Props = {
 interface RowProps extends Props {
   participant: LuckyDrawParticipant;
   index: number;
+  luckyDrawRewardMap: LuckyDrawRewardMap;
 }
+
+type LuckyDrawRewardMap = {
+  [key: string]: LuckyDrawReward;
+};

@@ -51,8 +51,6 @@ export default function ParticipantsTable() {
     }
   }, [refetch]);
 
-  console.log({ refetch, cursor, length: participants.length });
-
   useEffect(() => {
     const container = containerRef.current;
     if (!container || (total && total <= participants.length)) {

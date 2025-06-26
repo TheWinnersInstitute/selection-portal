@@ -10,7 +10,7 @@ import LuckyDrawParticipantForm, {
 } from "./form";
 import { Button } from "@/components/ui/button";
 import LuckyDrawParticipantsTable from "./table";
-import { Upload } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
@@ -29,6 +29,7 @@ export default function LuckyDrawParticipants({ winners }: Props) {
 
   const fetchingLuckyDrawParticipants = useLoading();
   const uploadingFile = useLoading();
+  const downloading = useLoading();
 
   const form = useForm<LuckyDrawParticipantFormType>({
     resolver: zodResolver(LuckyDrawParticipantFormSchema),
@@ -84,6 +85,34 @@ export default function LuckyDrawParticipants({ winners }: Props) {
     });
   };
 
+  // const downloadStudentsDataHandler = async () => {
+
+  // };
+  const downloadHandler = () => {
+    downloading.asyncWrapper(async () => {
+      const response = await apiClient.get(
+        `/api/lucky-draw/participants/${params.luckyDrawId}/download`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "students-data.xlsx");
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    });
+  };
+
   if (fetchingLuckyDrawParticipants.unauthorized) {
     return (
       <div className="flex flex-col items-center justify-center mt-10">
@@ -107,14 +136,26 @@ export default function LuckyDrawParticipants({ winners }: Props) {
             className="hidden"
             ref={bulkUploadInputRef}
           />
-          <Button
-            disabled={uploadingFile.loading}
-            onClick={() => bulkUploadInputRef.current?.click()}
-          >
-            <Upload />
-            {uploadingFile.loader || " Bulk"}
-          </Button>
-          <Button onClick={toggleLuckyDrawParticipantForm}>Participate</Button>
+          {!winners && (
+            <>
+              <Button
+                disabled={uploadingFile.loading}
+                onClick={() => bulkUploadInputRef.current?.click()}
+              >
+                <Upload />
+                {uploadingFile.loader || " Bulk"}
+              </Button>
+              <Button onClick={toggleLuckyDrawParticipantForm}>
+                Participate
+              </Button>
+            </>
+          )}
+          {winners && (
+            <Button disabled={downloading.loading} onClick={downloadHandler}>
+              <Download />
+              {downloading.loader || " Download"}
+            </Button>
+          )}
         </div>
       </div>
       <div className="flex justify-center items-center">
@@ -128,8 +169,10 @@ export default function LuckyDrawParticipants({ winners }: Props) {
           setEditData={setEditData}
           toggleLuckyDrawParticipantForm={toggleLuckyDrawParticipantForm}
           setLuckyDrawParticipants={setLuckyDrawParticipants}
+          winners={winners}
         />
       )}
+
       <LuckyDrawParticipantForm
         editData={editData}
         setLuckyDrawParticipants={setLuckyDrawParticipants}
