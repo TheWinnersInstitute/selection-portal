@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { prisma } from "../../../lib";
+import { prisma, RedisClient } from "../../../lib";
 import xlsx from "xlsx";
-import { LuckyDrawParticipant } from "@prisma/client";
+import fs from "fs";
 
 type BoolMapType = { [key: string]: boolean };
 
@@ -57,8 +57,6 @@ export async function addLuckyDrawParticipants(
       },
     });
 
-    const BATCH_SIZE = 1000;
-    const batches = Math.ceil(sheetData.length / BATCH_SIZE);
     const duplicateMap: BoolMapType = existingParticipants.reduce(
       (prev, curr) => {
         return { ...prev, [`${curr.name.toLowerCase()}-${curr.phone}`]: true };
@@ -82,17 +80,16 @@ export async function addLuckyDrawParticipants(
         };
       });
 
-    const participants = await prisma.$transaction(
-      data.map((item) => {
-        return prisma.luckyDrawParticipant.create({
-          data: item,
-        });
-      })
-    );
+    for (const item of data) {
+      await RedisClient.Instance.addToQueue("add-lucky-draw-participant", item);
+    }
 
+    if (fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
     res.status(200).json({
       message: "Lucky draw participant add successfully",
-      data: participants.slice(0, 100),
+      data: [],
     });
   } catch (error) {
     if (error instanceof Error)

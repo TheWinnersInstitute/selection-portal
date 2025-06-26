@@ -55,7 +55,7 @@ export async function createStudents(
 
     for (let i = 0; i < sheetData.length; i++) {
       const row = sheetData[i];
-      await RedisClient.Instance.addToQueue({
+      await RedisClient.Instance.addToQueue("create-student", {
         row,
         exams,
       });

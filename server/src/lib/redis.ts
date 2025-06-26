@@ -1,5 +1,5 @@
 import IORedis from "ioredis";
-import { Queue, Worker } from "bullmq";
+import { Job, Queue, Worker } from "bullmq";
 import { prisma } from "./db";
 import { uploadDriveFileToS3 } from "./google";
 import fs from "fs";
@@ -38,148 +38,24 @@ export class RedisClient {
     return this._instance || (this._instance = new this());
   }
 
-  async addToQueue(data: any) {
+  async addToQueue(name: string, data: any) {
     this.queueLength++;
-    await this.queue.add("create-student", data);
+    await this.queue.add(name, data);
   }
 
   worker() {
     const worker = new Worker(
       process.env.REDIS_QUEUE as string,
       async (job) => {
-        const { row, exams } = job.data;
-        try {
-          const shapedObject = {} as { [key: string]: any };
-          Object.keys(row).forEach((key) => {
-            const updatedKey = camelCase(key);
-            shapedObject[updatedKey] = row[key];
-          });
-          const {
-            examName,
-            mobileNumber,
-            name,
-            photo,
-            post,
-            result,
-            rollNumber,
-            email,
-            rank,
-            selectionIn,
-            year,
-            category,
-          } = shapedObject;
-
-          if (!mobileNumber) {
-            logger({
-              ...row,
-              Message: "Mobile number is required",
-            });
-            this.queueLength--;
-            return;
-          }
-
-          let student = await prisma.student.findUnique({
-            where: {
-              name_contactNumber: {
-                name,
-                contactNumber: parseInt(mobileNumber, 10),
-              },
-            },
-          });
-
-          let profileId: string | undefined;
-          let resultId: string | undefined;
-          if (!student) {
-            student = await prisma.student.create({
-              data: {
-                name,
-                contactNumber: parseInt(mobileNumber, 10),
-                imageId: profileId,
-                email,
-              },
-            });
-          }
-          console.log(student);
-          if (student && !student.imageId && photo) {
-            profileId = await uploadDriveFileToS3(photo, "student-profiles");
-            await prisma.student.update({
-              where: { id: student.id },
-              data: { imageId: profileId },
-            });
-          }
-
-          if (exams[examName]) {
-            if (!rollNumber) {
-              logger({
-                ...row,
-                Message: "Roll number is required",
-              });
-              this.queueLength--;
-              return;
-            }
-            const examCategory = await prisma.examCategory.findFirst({
-              where: {
-                examId: exams[examName],
-                name: category,
-              },
-            });
-
-            if (!examCategory && category) {
-              logger({
-                ...row,
-                Message: "Exam category not found",
-              });
-              this.queueLength--;
-              return;
-            }
-            let enrollment = await prisma.enrollment.findUnique({
-              where: {
-                rollNumber_examId: {
-                  examId: exams[examName],
-                  rollNumber: parseInt(rollNumber, 10),
-                },
-              },
-            });
-            if (!enrollment) {
-              enrollment = await prisma.enrollment.create({
-                data: {
-                  rollNumber: parseInt(rollNumber, 10),
-                  examId: exams[examName],
-                  post,
-                  resultId: resultId,
-                  studentId: student.id,
-                  rank: String(rank || "") || null,
-                  selectionIn,
-                  year: parseInt(year, 10) || null,
-                  examCategoryId: examCategory?.id,
-                },
-              });
-              if (enrollment && !enrollment.resultId && result)
-                resultId = await uploadDriveFileToS3(result, "student-results");
-              await prisma.enrollment.update({
-                where: { id: enrollment.id },
-                data: { resultId },
-              });
-            }
-          } else {
-            logger({
-              ...row,
-              Message: "Exam not found",
-            });
-          }
-        } catch (error) {
-          console.log(error);
-          logger({
-            ...row,
-            Message:
-              error instanceof Error ? error.message : "Something went wrong",
-          });
+        if (job.name === "add-lucky-draw-participant") {
+          await this.addLuckyDrawParticipant(job);
+        } else {
+          await this.createStudent(job);
         }
         this.queueLength--;
       },
       {
         connection: this.redisClient,
-        // lockDuration: 30000,
       }
     );
     worker.on("completed", (job) => {
@@ -192,6 +68,144 @@ export class RedisClient {
 
     worker.on("error", (err) => {
       console.error("Worker error", err);
+    });
+  }
+
+  async createStudent(job: Job<any, any, string>) {
+    const { row, exams } = job.data;
+    try {
+      const shapedObject = {} as { [key: string]: any };
+      Object.keys(row).forEach((key) => {
+        const updatedKey = camelCase(key);
+        shapedObject[updatedKey] = row[key];
+      });
+      const {
+        examName,
+        mobileNumber,
+        name,
+        photo,
+        post,
+        result,
+        rollNumber,
+        email,
+        rank,
+        selectionIn,
+        year,
+        category,
+      } = shapedObject;
+
+      if (!mobileNumber) {
+        logger({
+          ...row,
+          Message: "Mobile number is required",
+        });
+        this.queueLength--;
+        return;
+      }
+
+      let student = await prisma.student.findUnique({
+        where: {
+          name_contactNumber: {
+            name,
+            contactNumber: parseInt(mobileNumber, 10),
+          },
+        },
+      });
+
+      let profileId: string | undefined;
+      let resultId: string | undefined;
+      if (!student) {
+        student = await prisma.student.create({
+          data: {
+            name,
+            contactNumber: parseInt(mobileNumber, 10),
+            imageId: profileId,
+            email,
+          },
+        });
+      }
+      console.log(student);
+      if (student && !student.imageId && photo) {
+        profileId = await uploadDriveFileToS3(photo, "student-profiles");
+        await prisma.student.update({
+          where: { id: student.id },
+          data: { imageId: profileId },
+        });
+      }
+
+      if (exams[examName]) {
+        if (!rollNumber) {
+          logger({
+            ...row,
+            Message: "Roll number is required",
+          });
+          this.queueLength--;
+          return;
+        }
+        const examCategory = await prisma.examCategory.findFirst({
+          where: {
+            examId: exams[examName],
+            name: category,
+          },
+        });
+
+        if (!examCategory && category) {
+          logger({
+            ...row,
+            Message: "Exam category not found",
+          });
+          this.queueLength--;
+          return;
+        }
+        let enrollment = await prisma.enrollment.findUnique({
+          where: {
+            rollNumber_examId: {
+              examId: exams[examName],
+              rollNumber: parseInt(rollNumber, 10),
+            },
+          },
+        });
+        if (!enrollment) {
+          enrollment = await prisma.enrollment.create({
+            data: {
+              rollNumber: parseInt(rollNumber, 10),
+              examId: exams[examName],
+              post,
+              resultId: resultId,
+              studentId: student.id,
+              rank: String(rank || "") || null,
+              selectionIn,
+              year: parseInt(year, 10) || null,
+              examCategoryId: examCategory?.id,
+            },
+          });
+          if (enrollment && !enrollment.resultId && result)
+            resultId = await uploadDriveFileToS3(result, "student-results");
+          await prisma.enrollment.update({
+            where: { id: enrollment.id },
+            data: { resultId },
+          });
+        }
+      } else {
+        logger({
+          ...row,
+          Message: "Exam not found",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      logger({
+        ...row,
+        Message:
+          error instanceof Error ? error.message : "Something went wrong",
+      });
+    }
+  }
+
+  async addLuckyDrawParticipant(job: Job<any, any, string>) {
+    const participant = job.data;
+    await prisma.luckyDrawParticipant.create({
+      data: participant,
     });
   }
 }
