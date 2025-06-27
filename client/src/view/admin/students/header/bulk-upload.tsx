@@ -47,7 +47,8 @@ export default function BulkUpload({
       const interval = setInterval(async () => {
         const { data } = await apiClient.get("/api/student/bulk/status");
         setUnderProcess(data.data[0]);
-        if (data.data[0] === 0) {
+        if (data.data[0] <= 0) {
+          setUnderProcess(0);
           if (!firstRender) {
             triggerRefetchStudents();
           }

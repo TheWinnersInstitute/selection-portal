@@ -25,6 +25,15 @@ import { z } from "zod";
 import ParticipantsTable from "./participants-table";
 import WinnersTable from "./winners-table";
 import { toast } from "sonner";
+import Loader from "@/components/ui/loader";
+
+const delay = (time: number) => {
+  return new Promise((res, rej) => {
+    setTimeout(() => {
+      res("");
+    }, time);
+  });
+};
 
 export default function LuckyDrawExecution({
   luckyDraw,
@@ -62,6 +71,7 @@ export default function LuckyDrawExecution({
             params: !!values.count ? { count: values.count } : {},
           }
         );
+        await delay(10000);
         setWinners(data.data);
       }
     });
@@ -156,9 +166,15 @@ export default function LuckyDrawExecution({
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-3 min-h-[90vh] gap-5">
+            <div className="grid grid-cols-3 min-h-[90vh] gap-10">
               <div className="col-span-2">
-                {!winners && luckyDraw.bannerId && (
+                {submitting.loading && (
+                  <Loader
+                    variant="danger"
+                    message="Choosing winners... this might take a while"
+                  />
+                )}
+                {!winners && !submitting.loading && luckyDraw.bannerId && (
                   <Image
                     alt={luckyDraw.id}
                     src={`${process.env.NEXT_PUBLIC_API_URL}/api/admin/assets/${luckyDraw.bannerId}`}
