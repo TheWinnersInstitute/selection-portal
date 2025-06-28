@@ -5,11 +5,17 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 
-import { authRoutes, boardRoutes, examRoutes, studentRoutes } from "./routes";
+import {
+  authRoutes,
+  boardRoutes,
+  examRoutes,
+  studentRoutes,
+  adminRoutes,
+  userRoutes,
+  luckyDrawRoutes,
+  bannerRoutes,
+} from "./routes";
 import { RedisClient, S3, seed } from "./lib";
-import { adminRoutes } from "./routes/admin.routes";
-import { userRoutes } from "./routes/user.routes";
-import { luckyDrawRoutes } from "./routes/lucky-draw.routes";
 
 async function main() {
   const PORT = process.env.PORT;
@@ -37,6 +43,7 @@ async function main() {
   });
 
   app.use("/api/auth", authRoutes);
+  app.use("/api/banner", bannerRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/board", boardRoutes);
   app.use("/api/exam", examRoutes);

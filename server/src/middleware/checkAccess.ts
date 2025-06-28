@@ -7,7 +7,8 @@ type Model =
   | "student"
   | "user"
   | "role"
-  | "luckyDraw";
+  | "luckyDraw"
+  | "banner";
 type Action = "read" | "create" | "update" | "delete";
 
 export function checkAccess(mode: Model, action: Action) {

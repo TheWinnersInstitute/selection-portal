@@ -149,6 +149,7 @@ model Asset {
   LuckyDrawReward      LuckyDrawReward[]
   LuckyDrawParticipant LuckyDrawParticipant[]
   LuckyDraw            LuckyDraw[]
+  Banner               Banner[]
 
   @@map("assets")
 }
@@ -164,6 +165,7 @@ model Role {
   student    Action[]
   user       Action[]
   role       Action[]
+  banner     Action[]  @default([])
   luckyDraw  Action[]  @default([])
 
   @@map("roles")
@@ -221,6 +223,22 @@ model LuckyDrawParticipant {
 
   @@unique([luckyDrawId, name, phone])
   @@map("luckyDrawParticipants")
+}
+
+model Banner {
+  id          String  @id @default(uuid())
+  name        String
+  imageId     String
+  description String?
+  link        String?
+  sequence    Int     @default(1)
+
+  image Asset @relation(fields: [imageId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("banners")
 }
 
 enum Action {

@@ -13,7 +13,7 @@ import {
 } from "../controllers/student";
 import { checkRequestPayload, checkAccess, checkAuth } from "../middleware";
 import { z } from "zod";
-import { S3, studentBulkUpload } from "../lib/s3";
+import { S3, assetUpload } from "../lib/s3";
 import { downloadStudentsExcel } from "../controllers/student/download";
 import {
   createEnrollment,
@@ -95,7 +95,7 @@ studentRoutes.post(
   "/bulk",
   checkAuth,
   checkAccess("student", "create"),
-  studentBulkUpload.single("file"),
+  assetUpload.single("file"),
   createStudents
 );
 

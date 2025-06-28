@@ -26,6 +26,8 @@ export async function seed() {
         role: ["create", "delete", "read", "update"],
         user: ["create", "delete", "read", "update"],
         student: ["create", "delete", "read", "update"],
+        banner: ["create", "delete", "read", "update"],
+        luckyDraw: ["create", "delete", "read", "update"],
       },
     });
     if (adminExist) {

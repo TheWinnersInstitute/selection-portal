@@ -12,6 +12,7 @@ export class S3 {
   private static _instance: S3;
   public s3: AWS.S3;
   public uploadFile: multer.Multer;
+  public uploadBanner: multer.Multer;
   public uploadResult: multer.Multer;
 
   constructor() {
@@ -21,54 +22,9 @@ export class S3 {
       region: process.env.AWS_REGION,
     });
 
-    this.uploadFile = multer({
-      limits: {
-        fileSize: 20 * 1024 * 1024,
-      },
-      storage: multerS3({
-        s3: new S3Client({
-          credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-          },
-          region: process.env.AWS_REGION,
-        }),
-        bucket: process.env.AWS_S3_BUCKET as string,
-        metadata: function (req, file, cb) {
-          cb(null, { fieldName: file.fieldname });
-        },
-        key: function (req, file, cb) {
-          cb(
-            null,
-            `student-profiles/${Date.now()}_${toSnakeCase(file.originalname)}`
-          );
-        },
-      }),
-    });
-    this.uploadResult = multer({
-      limits: {
-        fileSize: 20 * 1024 * 1024,
-      },
-      storage: multerS3({
-        s3: new S3Client({
-          credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-          },
-          region: process.env.AWS_REGION,
-        }),
-        bucket: process.env.AWS_S3_BUCKET as string,
-        metadata: function (req, file, cb) {
-          cb(null, { fieldName: file.fieldname });
-        },
-        key: function (req, file, cb) {
-          cb(
-            null,
-            `student-results/${Date.now()}_${toSnakeCase(file.originalname)}`
-          );
-        },
-      }),
-    });
+    this.uploadFile = this.multerUploader("student-profiles");
+    this.uploadBanner = this.multerUploader("banners");
+    this.uploadResult = this.multerUploader("student-results");
   }
 
   backup() {
@@ -120,6 +76,51 @@ export class S3 {
   public static get instance() {
     return this._instance || (this._instance = new this());
   }
+
+  async deleteAsset(id: string): Promise<string> {
+    const deletedAsset = await prisma.asset.delete({
+      where: { id },
+    });
+    return new Promise((res, rej) => {
+      this.s3.deleteObject(
+        {
+          Key: deletedAsset.path,
+          Bucket: process.env.AWS_S3_BUCKET as string,
+        },
+        (err, data) => {
+          if (err?.statusCode === 200) {
+            res("Asset deleted successfully");
+            return;
+          }
+          rej(err.message);
+        }
+      );
+    });
+  }
+
+  private multerUploader(folder: string) {
+    return multer({
+      limits: {
+        fileSize: 20 * 1024 * 1024,
+      },
+      storage: multerS3({
+        s3: new S3Client({
+          credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+          },
+          region: process.env.AWS_REGION,
+        }),
+        bucket: process.env.AWS_S3_BUCKET as string,
+        metadata: function (req, file, cb) {
+          cb(null, { fieldName: file.fieldname });
+        },
+        key: function (req, file, cb) {
+          cb(null, `${folder}/${Date.now()}_${toSnakeCase(file.originalname)}`);
+        },
+      }),
+    });
+  }
 }
 
-export const studentBulkUpload = multer({ dest: "assets/" });
+export const assetUpload = multer({ dest: "assets/" });

@@ -40,6 +40,7 @@ const SECTIONS: { id: keyof RoleFormType; title: string }[] = [
   { title: "Role", id: "role" },
   { title: "User", id: "user" },
   { title: "Lucky Draw", id: "luckyDraw" },
+  { title: "Banner", id: "banner" },
 ];
 
 const items: { id: "read" | "create" | "update" | "delete"; label: string }[] =
@@ -83,6 +84,7 @@ export default function RoleForm({
       student: [],
       user: [],
       luckyDraw: [],
+      banner: [],
     },
   });
 
@@ -227,4 +229,5 @@ const RoleFormSchema = z.object({
   role: z.array(z.enum(["read", "create", "update", "delete"])),
   user: z.array(z.enum(["read", "create", "update", "delete"])),
   luckyDraw: z.array(z.enum(["read", "create", "update", "delete"])),
+  banner: z.array(z.enum(["read", "create", "update", "delete"])),
 });

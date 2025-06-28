@@ -3,8 +3,17 @@ import { errorResponse, prisma } from "../../../lib";
 
 export async function createRole(req: Request, res: Response) {
   try {
-    const { name, board, enrollment, exam, student, luckyDraw, role, user } =
-      req.body;
+    const {
+      name,
+      board,
+      enrollment,
+      exam,
+      student,
+      luckyDraw,
+      role,
+      user,
+      banner,
+    } = req.body;
 
     const createdRole = await prisma.role.create({
       data: {
@@ -16,6 +25,7 @@ export async function createRole(req: Request, res: Response) {
         luckyDraw,
         role,
         user,
+        banner,
       },
     });
     res.json({

@@ -39,6 +39,12 @@ adminRoutes.get(
     }),
     "params"
   ),
+  checkRequestPayload(
+    z.object({
+      _cache: z.string().optional(),
+    }),
+    "query"
+  ),
   getAsset
 );
 
@@ -99,6 +105,7 @@ adminRoutes.post(
       role: z.array(z.enum(["read", "create", "update", "delete"])),
       user: z.array(z.enum(["read", "create", "update", "delete"])),
       luckyDraw: z.array(z.enum(["read", "create", "update", "delete"])),
+      banner: z.array(z.enum(["read", "create", "update", "delete"])),
     })
   ),
   createRole
@@ -118,6 +125,7 @@ adminRoutes.patch(
       role: z.array(z.enum(["read", "create", "update", "delete"])),
       user: z.array(z.enum(["read", "create", "update", "delete"])),
       luckyDraw: z.array(z.enum(["read", "create", "update", "delete"])),
+      banner: z.array(z.enum(["read", "create", "update", "delete"])),
     })
   ),
   updateRole

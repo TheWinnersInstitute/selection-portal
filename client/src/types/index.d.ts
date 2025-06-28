@@ -66,6 +66,7 @@ type Role = {
   user: Action[];
   role: Action[];
   luckyDraw: Action[];
+  banner: Action[];
 };
 
 type LuckyDraw = {
@@ -110,4 +111,12 @@ type Asset = {
   id: string;
   path: string;
   type: string;
+};
+
+type Banner = {
+  id: string;
+  name: string;
+  link?: string;
+  imageId: string;
+  sequence: string;
 };

@@ -48,6 +48,8 @@ export default function RolesTable({
           <TableHead>Enrollment</TableHead>
           <TableHead>User</TableHead>
           <TableHead>Role</TableHead>
+          <TableHead>Banner</TableHead>
+          <TableHead>Lucky draw</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -67,6 +69,12 @@ export default function RolesTable({
               </TableCell>
               <TableCell>{role.user.map((a) => a[0].toUpperCase())}</TableCell>
               <TableCell>{role.role.map((a) => a[0].toUpperCase())}</TableCell>
+              <TableCell>
+                {role.banner.map((a) => a[0].toUpperCase())}
+              </TableCell>
+              <TableCell>
+                {role.luckyDraw.map((a) => a[0].toUpperCase())}
+              </TableCell>
               <TableCell className="flex justify-end items-center gap-2">
                 <Button
                   onClick={() => {

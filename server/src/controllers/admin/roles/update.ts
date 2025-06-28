@@ -13,6 +13,7 @@ export async function updateRole(req: Request, res: Response) {
       role,
       user,
       luckyDraw,
+      banner,
     } = req.body;
 
     const newRole = await prisma.role.update({
@@ -28,6 +29,7 @@ export async function updateRole(req: Request, res: Response) {
         role,
         user,
         luckyDraw,
+        banner,
       },
     });
     res.json({

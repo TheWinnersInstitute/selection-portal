@@ -18,7 +18,7 @@ import {
   getLuckyDrawParticipants,
   updateLuckyDrawParticipant,
 } from "../controllers/lucky-draw/participant";
-import { S3, studentBulkUpload } from "../lib";
+import { S3, assetUpload } from "../lib";
 import {
   addLuckyDrawReward,
   deleteLuckyDrawReward,
@@ -155,7 +155,7 @@ luckyDrawRoutes.post(
     }),
     "params"
   ),
-  studentBulkUpload.single("file"),
+  assetUpload.single("file"),
   addLuckyDrawParticipants
 );
 

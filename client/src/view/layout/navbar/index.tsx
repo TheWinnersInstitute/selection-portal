@@ -26,6 +26,7 @@ import {
   GraduationCap,
   HandCoins,
   MonitorCogIcon,
+  PanelsTopLeft,
   User,
   Users,
 } from "lucide-react";
@@ -51,6 +52,11 @@ const items = [
     url: "/admin/lucky-draw",
     icon: HandCoins,
   },
+  // {
+  //   title: "Main",
+  //   url: "/admin/main/banner",
+  //   icon: PanelsTopLeft,
+  // },
   {
     title: "Roles",
     url: "/admin/role",
